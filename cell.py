@@ -17,7 +17,7 @@ class LivingCell(object):
     def draw(self, window_object, width, scale = 1):
         pygame.draw.rect(window_object, self.color,
                 ((self.xCoord * width + self.xCoord + 1) * scale,
-                (self.yCoord * width + self.yCoord + 1 * scale), width * scale,
+                (self.yCoord * width + self.yCoord + 1) * scale, width * scale,
                 width * scale))
         """pygame.draw.rect(mainWindow, colors['black'], (i * choice + i + 1,
                     j * choice + j + 1, choice, choice))"""

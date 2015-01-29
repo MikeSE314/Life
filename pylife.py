@@ -4,18 +4,21 @@ import sys, random, math, types
 import cell, PlaceholdingClass
 
 def assure_cell_at(xCoord, yCoord):
+    """Make certain a cell exists in the list with the coordinates."""
     for livingCell in livingCells:
         if livingCell.get_coordinates() == [xCoord, yCoord]:
             return
     livingCells.append(cell.LivingCell(xCoord, yCoord))
 
 def is_cell_at(xCoord, yCoord):
+    """return whether or not a cell with given coordinates exists."""
     for livingCell in livingCells:
         if livingCell.get_coordinates() == [xCoord, yCoord]:
             return True
     return False
 
 def remove_cell_at(xCoord, yCoord):
+    """remove the cell at given coordinates"""
     index = None
     for i in range(len(livingCells)):
         if livingCells[i].get_coordinates() == [xCoord, yCoord]:
@@ -65,13 +68,13 @@ def draw_grid():
             pygame.draw.rect(mainWindow, mainWindowColors[1],
                     (i * choice + i + 1, j * choice + j + 1, choice, choice))
             pygame.draw.rect(miniView, miniViewColors[1],
-                    ((i * choice + i + 1) / 6 , (j * choice + j + 1) / 6,
-                    choice / 6, choice / 6))
+                    ((i * choice + i + 1) * coef, (j * choice + j + 1) * coef,
+                    choice * coef, choice * coef))
 
 def draw_cells():
     for livingCell in livingCells:
         livingCell.draw(mainWindow, choice)
-        livingCell.draw(miniView, choice, 1. / 6.)
+        livingCell.draw(miniView, choice, coef)
 
 def draw_mini_view():
     mainWindow.blit(miniView, (windowDimensions[0] - miniView.get_width(), 0))
@@ -86,20 +89,23 @@ def check_events():
             mousex, mousey = event.pos
         elif event.type == MOUSEBUTTONDOWN:
             mouseIsDown = True
-            removingCells = is_cell_at(int(mousex / (choice + 1)), int(mousey / (choice + 1)))
+            removingCells = is_cell_at(int(mousex / (choice + 1)),
+                    int(mousey / (choice + 1)))
         elif event.type == MOUSEBUTTONUP:
             mousex, mousey = event.pos
             mouseIsDown = False
         elif event.type == KEYDOWN:
             if event.key in (K_LEFT, K_RIGHT, K_UP, K_DOWN):
-                pass
+                pass#TODO make it count cells. Here, for now, becasue events.
             if event.key == K_ESCAPE:
                 pygame.event.post(pygame.event.Event(QUIT))
 
 def _game_init_():
     global mainWindow, mainWindowColors, miniView, miniViewColors
     global windowDimensions, gridMain, mousex, mousey, mousexCoord, mouseyCoord
-    global colors, portion_of_step, livingCells, mouseIsDown, fpsClock
+    global colors, portion_of_step, livingCells, mouseIsDown, fpsClock, coef
+
+    coef = 1. / 4.
     pygame.init()
     fpsClock = pygame.time.Clock()
 
@@ -107,7 +113,8 @@ def _game_init_():
 
     mainWindow = pygame.display.set_mode(windowDimensions, pygame.FULLSCREEN)
     windowDimensions = (mainWindow.get_size())
-    miniView = pygame.Surface((windowDimensions[0] / 6, windowDimensions[1] / 6))
+    miniView = pygame.Surface((windowDimensions[0] * coef,
+            windowDimensions[1] * coef))
 
     colors = {
     'darkRed': pygame.Color(127, 0, 0),
