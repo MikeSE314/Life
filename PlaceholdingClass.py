@@ -6,5 +6,7 @@ class PlaceholdingClass(object):
         super(PlaceholdingClass, self).__init__()
     def get_coordinates(self):
         return
-    def draw(self, window_object, width, scale = 1):
+    def draw(self, *args):
         pass
+    def give_to_neighbors(self):
+        return
