@@ -120,8 +120,6 @@ def boring_beginning_of_loop_stuff():
 
 
 def boring_end_of_loop_stuff():
-    global population
-    print population
     pygame.transform.flip(mainWindow, True, True)
     pygame.transform.flip(miniView, True, True)
     pygame.display.update(dirtyRects)
@@ -141,9 +139,14 @@ def draw_grid():
 
 
 def draw_cells():
+    global population, fontObj
     for livingCell in livingCells:
         livingCell.draw(dirtyRects, mainWindow, choice)
         livingCell.draw(dirtyRects, miniView, choice, coef, coef)
+    popMsg = fontObj.render(str(population), False, colors['lightBlue'])
+    popMsgRect = popMsg.get_rect()
+    popMsgRect.topleft = (10, 200)
+    mainWindow.blit(popMsg, popMsgRect)
 
 
 def draw_mini_view():
@@ -166,8 +169,10 @@ def check_events():
             mousex, mousey = event.pos
             mouseIsDown = False
         elif event.type == KEYDOWN:
-            if event.key in (K_LEFT, K_RIGHT, K_UP, K_DOWN, K_y):
+            if event.key == (K_y):
                 mouseColor = colors['green']
+            if event.key == (K_h):
+                mouseColor = colors[random.choice(colors.keys())]
             if event.key == K_ESCAPE:
                 pygame.event.post(pygame.event.Event(QUIT))
 
@@ -176,7 +181,7 @@ def _game_init_():
     global coef, colors, mousex, mousey, fpsClock, gridMain, miniView
     global mainWindow, livingCells, mouseIsDown, mousexCoord, mouseyCoord
     global miniViewColors, readyToGenerate, mainWindowColors, population
-    global windowDimensions, dirtyRects, gameTimer, mouseColor
+    global windowDimensions, dirtyRects, gameTimer, mouseColor, fontObj
     population = 0
     dirtyRects = []
     coef = 1. / 4.
@@ -184,7 +189,7 @@ def _game_init_():
     fpsClock = pygame.time.Clock()
     readyToGenerate = False
     windowDimensions = (0, 0)
-    mainWindow = pygame.display.set_mode(windowDimensions)#, pygame.FULLSCREEN)
+    mainWindow = pygame.display.set_mode(windowDimensions, pygame.FULLSCREEN)
     windowDimensions = (mainWindow.get_size())
     miniView = pygame.Surface(
         (windowDimensions[0] * coef, windowDimensions[1] * coef))
@@ -212,6 +217,7 @@ def _game_init_():
         'grey': pygame.Color(127, 127, 127),
         'white': pygame.Color(255, 255, 255)
     }
+    fontObj = pygame.font.Font('freesansbold.ttf', 32)
     mousex, mousey, mousexCoord, mouseyCoord = 0, 0, 0, 0
     mouseColor = colors['red']
     gridMain = [20, 40]
@@ -226,3 +232,6 @@ def _game_init_():
     assure_cell_at(colors['blue'], 1, 2)
     pygame.display.set_caption('Lyfe')
     gameTimer = timer.Timer(colors['darkGreen'])
+
+if __name__ == '__main__':
+    import main
