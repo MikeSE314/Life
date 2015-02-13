@@ -71,12 +71,16 @@ def deal_w_game_time():
 
 
 def deal_w_making_deleting_cells():
+    global check_needs
     if mouseIsDown:
         if removingCells:
             remove_cell_at(mousexCoord, mouseyCoord)
+            check_needs['population'] = True
         else:
             assure_cell_at(mouseColor, int(mousex / (choice + 1)),
                            int(mousey / (choice + 1)))
+            check_needs['population'] = True
+            check_needs['population'] = True
 
 
 def care_for_cells():
@@ -226,6 +230,7 @@ def check_events():
 
 
 def _game_init_():
+    print(pygame.locals.__dict__)
     global coef, colors, mousex, mousey, fpsClock, gridMain, miniView
     global mainWindow, livingCells, mouseIsDown, mousexCoord, mouseyCoord
     global miniViewColors, readyToGenerate, mainWindowColors, population
@@ -243,10 +248,20 @@ def _game_init_():
     windowDimensions = (mainWindow.get_size())
     miniView = pygame.Surface(
         (windowDimensions[0] * coef, windowDimensions[1] * coef))
-    pygame.mixer.music.load('The Caledonian Club/1 - The Caledonian Club - Morning Thought.mp3')
+    songs = ['The Caledonian Club/1 - Morning Thought.mp3',
+             'The Caledonian Club/2 - Staring At My Sunset.mp3',
+             'The Caledonian Club/3 - Courage With Style.mp3',
+             'The Caledonian Club/4 - Liberty Memories.mp3',
+             'The Caledonian Club/5 - Loose Optimism.mp3',
+             'The Caledonian Club/6 - The Night I Saw Your Musings.mp3',
+             'The Caledonian Club/7 - Casino Of Tricks.mp3',
+             'The Caledonian Club/8 - The Worlds of Time.mp3',
+             'The Caledonian Club/9 - Boxed Repetition.mp3']
+    pygame.mixer.music.load('bckgmusic.ogg')
+    songOrder = random.sample(songs, len(songs))
     pygame.mixer.music.play()
-    pygame.mixer.music.queue('The Caledonian Club/2 - The Caledonian Club - Staring At My Sunset.mp3')
-    pygame.mixer.music.queue('The Caledonian Club/3 - The Caledonian Club - Courage With Style.mp3')
+    for i in range(len(songs)):
+        pygame.mixer.music.queue(songOrder[i])
     colors = {
         'darkRed': pygame.Color(127, 0, 0),
         'red': pygame.Color(255, 0, 0),
