@@ -51,10 +51,13 @@ def remove_cell_at(xCoord, yCoord=None):
 
 def determine_variables():
     global choice, width, height, mousexCoord, mouseyCoord, livingCells
-    global population
-    population = len(livingCells) - 1
+    global population, check_needs
+    if check_needs['population']:
+        population = len(livingCells) - 1
+        check_needs['population'] = False
     width = (windowDimensions[0] - gridMain[0] - 1) / float(gridMain[0])
     height = (windowDimensions[1] - gridMain[1] - 1) / float(gridMain[1])
+    #print(width, height)
     choice = max(width, height)
     mousexCoord = int(mousex / (choice + 1))
     mouseyCoord = int(mousey / (choice + 1))
@@ -62,24 +65,60 @@ def determine_variables():
 
 def deal_w_game_time():
     global readyToGenerate, gameTimer
-    readyToGenerate = gameTimer.update_portion(math.pi / 5)
+    readyToGenerate = gameTimer.update_portion(math.pi / 20)
     gameTimer.draw(dirtyRects, mainWindow, (windowDimensions[0] - 60,
-                                              windowDimensions[1] - 60), 50)
+                                            windowDimensions[1] - 60), 50)
 
 
 def deal_w_making_deleting_cells():
-    global mouseColor
     if mouseIsDown:
         if removingCells:
             remove_cell_at(mousexCoord, mouseyCoord)
         else:
-            assure_cell_at(mouseColor, int(mousex / (choice + 1)), int(mousey /
-                           (choice + 1)))
+            assure_cell_at(mouseColor, int(mousex / (choice + 1)),
+                           int(mousey / (choice + 1)))
+
+
+def care_for_cells():
+    if len(livingCells) > 1:
+        xMin = livingCells[1].get_coordinates()[0]
+        xMax = xMin
+        yMin = livingCells[1].get_coordinates()[1]
+        yMax = yMin
+        for i in range(len(livingCells) - 1):
+            xMin = min(xMin, livingCells[i + 1].get_coordinates()[0])
+            xMax = max(xMax, livingCells[i + 1].get_coordinates()[0])
+            yMin = min(yMin, livingCells[i + 1].get_coordinates()[1])
+            yMax = max(yMax, livingCells[i + 1].get_coordinates()[1])
+        if xMin < 0:
+            if yMin < 0:
+                for i in range(len(livingCells) - 1):
+                    livingCells[i + 1].set_coordinates(livingCells[i + 1].
+                                                       get_coordinates()[0] -
+                                                       xMin, livingCells[i + 1]
+                                                       .get_coordinates()[1] -
+                                                       yMin)
+            else:
+                for i in range(len(livingCells) - 1):
+                    livingCells[i + 1].set_coordinates(livingCells[i + 1].
+                                                       get_coordinates()[0] -
+                                                       xMin, livingCells[i + 1]
+                                                       .get_coordinates()[1])
+        elif yMin < 0:
+            for i in range(len(livingCells) - 1):
+                livingCells[i + 1].set_coordinates(livingCells[i + 1].
+                                                   get_coordinates()[0],
+                                                   livingCells[i + 1]
+                                                   .get_coordinates()[1] -
+                                                   yMin)
+        if xMax > choice:
+            pass
 
 
 def generation():
-    global readyToGenerate
+    global readyToGenerate, check_needs
     readyToGenerate = False
+    check_needs['population'] = True
     generationDict = {}
     for livingCell in livingCells:
         if livingCell.give_to_neighbors():
@@ -110,7 +149,7 @@ def generation():
 
 
 def boring_beginning_of_loop_stuff():
-    global readyToGenerate, dirtyRects
+    global readyToGenerate, dirtyRects, soundObj
     dirtyRects = []
     pygame.transform.flip(mainWindow, True, True)
     mainWindow.fill(mainWindowColors[0])
@@ -123,7 +162,6 @@ def boring_end_of_loop_stuff():
     pygame.transform.flip(mainWindow, True, True)
     pygame.transform.flip(miniView, True, True)
     pygame.display.update(dirtyRects)
-    pygame.display.update()
     fpsClock.tick(30)
 
 
@@ -134,8 +172,10 @@ def draw_grid():
                              (i * choice + i + 1, j * choice + j + 1, choice,
                               choice))
             pygame.draw.rect(miniView, miniViewColors[1], ((i * choice + i + 1)
-                             * coef, (j * choice + j + 1) * coef, choice *
-                             coef, choice * coef))
+                                                           * coef, (j * choice
+                                                                    + j + 1) *
+                                                           coef, choice * coef,
+                                                           choice * coef))
 
 
 def draw_cells():
@@ -173,6 +213,14 @@ def check_events():
                 mouseColor = colors['green']
             if event.key == (K_h):
                 mouseColor = colors[random.choice(colors.keys())]
+            if event.key == K_LEFT:
+                gridMain[0] -= 1
+            if event.key == K_RIGHT:
+                gridMain[0] += 1
+            if event.key == K_UP:
+                gridMain[1] -= 1
+            if event.key == K_DOWN:
+                gridMain[1] += 1
             if event.key == K_ESCAPE:
                 pygame.event.post(pygame.event.Event(QUIT))
 
@@ -182,6 +230,8 @@ def _game_init_():
     global mainWindow, livingCells, mouseIsDown, mousexCoord, mouseyCoord
     global miniViewColors, readyToGenerate, mainWindowColors, population
     global windowDimensions, dirtyRects, gameTimer, mouseColor, fontObj
+    global check_needs, backgroundMusic
+    check_needs = {'population': False}
     population = 0
     dirtyRects = []
     coef = 1. / 4.
@@ -193,6 +243,10 @@ def _game_init_():
     windowDimensions = (mainWindow.get_size())
     miniView = pygame.Surface(
         (windowDimensions[0] * coef, windowDimensions[1] * coef))
+    pygame.mixer.music.load('The Caledonian Club/1 - The Caledonian Club - Morning Thought.mp3')
+    pygame.mixer.music.play()
+    pygame.mixer.music.queue('The Caledonian Club/2 - The Caledonian Club - Staring At My Sunset.mp3')
+    pygame.mixer.music.queue('The Caledonian Club/3 - The Caledonian Club - Courage With Style.mp3')
     colors = {
         'darkRed': pygame.Color(127, 0, 0),
         'red': pygame.Color(255, 0, 0),

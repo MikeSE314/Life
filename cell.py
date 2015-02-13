@@ -37,3 +37,10 @@ class LivingCell(object):
 
     def get_coordinates(self):
         return((self.xCoord, self.yCoord))
+
+    def set_coordinates(self, xCoord, yCoord=None):
+        if yCoord is not None:
+            self.xCoord = xCoord
+            self.yCoord = yCoord
+        else:
+            self.xCoord, self.yCoord = xCoord
