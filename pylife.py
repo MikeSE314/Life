@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import sys
+import os
 import random
 import math
 import types
@@ -52,9 +53,9 @@ def remove_cell_at(xCoord, yCoord=None):
 def determine_variables():
     global choice, width, height, mousexCoord, mouseyCoord, livingCells
     global population, check_needs
-    if check_needs['population']:
+    if check_needs["population"]:
         population = len(livingCells) - 1
-        check_needs['population'] = False
+        check_needs["population"] = False
     width = (windowDimensions[0] - gridMain[0] - 1) / float(gridMain[0])
     height = (windowDimensions[1] - gridMain[1] - 1) / float(gridMain[1])
     #print(width, height)
@@ -75,12 +76,12 @@ def deal_w_making_deleting_cells():
     if mouseIsDown:
         if removingCells:
             remove_cell_at(mousexCoord, mouseyCoord)
-            check_needs['population'] = True
+            check_needs["population"] = True
         else:
             assure_cell_at(mouseColor, int(mousex / (choice + 1)),
                            int(mousey / (choice + 1)))
-            check_needs['population'] = True
-            check_needs['population'] = True
+            check_needs["population"] = True
+            check_needs["population"] = True
 
 
 def care_for_cells():
@@ -122,7 +123,7 @@ def care_for_cells():
 def generation():
     global readyToGenerate, check_needs
     readyToGenerate = False
-    check_needs['population'] = True
+    check_needs["population"] = True
     generationDict = {}
     for livingCell in livingCells:
         if livingCell.give_to_neighbors():
@@ -187,7 +188,7 @@ def draw_cells():
     for livingCell in livingCells:
         livingCell.draw(dirtyRects, mainWindow, choice)
         livingCell.draw(dirtyRects, miniView, choice, coef, coef)
-    popMsg = fontObj.render(str(population), False, colors['lightBlue'])
+    popMsg = fontObj.render(str(population), False, colors["lightBlue"])
     popMsgRect = popMsg.get_rect()
     popMsgRect.topleft = (10, 200)
     mainWindow.blit(popMsg, popMsgRect)
@@ -199,6 +200,7 @@ def draw_mini_view():
 
 def check_events():
     global mousex, mousey, removingCells, mouseIsDown, colors, mouseColor
+    global songOrder, music_index_var
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -214,7 +216,7 @@ def check_events():
             mouseIsDown = False
         elif event.type == KEYDOWN:
             if event.key == (K_y):
-                mouseColor = colors['green']
+                mouseColor = colors["green"]
             if event.key == (K_h):
                 mouseColor = colors[random.choice(colors.keys())]
             if event.key == K_LEFT:
@@ -227,16 +229,24 @@ def check_events():
                 gridMain[1] += 1
             if event.key == K_ESCAPE:
                 pygame.event.post(pygame.event.Event(QUIT))
+        elif event.type == MUSIC_HAS_ENDED:
+            pygame.mixer.music.queue(songOrder[music_index_var %
+                                               len(songOrder)])
+            print songOrder[music_index_var % len(songOrder)]
+            music_index_var += 1
+            print songOrder[music_index_var % len(songOrder)]
 
 
 def _game_init_():
-    print(pygame.locals.__dict__)
     global coef, colors, mousex, mousey, fpsClock, gridMain, miniView
     global mainWindow, livingCells, mouseIsDown, mousexCoord, mouseyCoord
     global miniViewColors, readyToGenerate, mainWindowColors, population
     global windowDimensions, dirtyRects, gameTimer, mouseColor, fontObj
-    global check_needs, backgroundMusic
-    check_needs = {'population': False}
+    global check_needs, backgroundMusic, MUSIC_HAS_ENDED, music_index_var
+    global songOrder
+    music_index_var = 0
+    MUSIC_HAS_ENDED = 18
+    check_needs = {"population": False}
     population = 0
     dirtyRects = []
     coef = 1. / 4.
@@ -248,59 +258,56 @@ def _game_init_():
     windowDimensions = (mainWindow.get_size())
     miniView = pygame.Surface(
         (windowDimensions[0] * coef, windowDimensions[1] * coef))
-    songs = ['The Caledonian Club/1 - Morning Thought.mp3',
-             'The Caledonian Club/2 - Staring At My Sunset.mp3',
-             'The Caledonian Club/3 - Courage With Style.mp3',
-             'The Caledonian Club/4 - Liberty Memories.mp3',
-             'The Caledonian Club/5 - Loose Optimism.mp3',
-             'The Caledonian Club/6 - The Night I Saw Your Musings.mp3',
-             'The Caledonian Club/7 - Casino Of Tricks.mp3',
-             'The Caledonian Club/8 - The Worlds of Time.mp3',
-             'The Caledonian Club/9 - Boxed Repetition.mp3']
-    pygame.mixer.music.load('bckgmusic.ogg')
+    musicDirectory = "music/The Caledonian Club/"
+    songs = [(musicDirectory + song) for song in os.listdir(musicDirectory) if
+             song[-3] is "m"]
+    print songs
+    print song, " " is " ", song[-3:] is song[-3:]
     songOrder = random.sample(songs, len(songs))
+    pygame.mixer.music.load(songOrder[len(songs) - 1])
     pygame.mixer.music.play()
-    for i in range(len(songs)):
-        pygame.mixer.music.queue(songOrder[i])
+    pygame.mixer.music.set_endevent(MUSIC_HAS_ENDED)
+    pygame.mixer.music.queue(songOrder[music_index_var % 18])
+    music_index_var += 1
     colors = {
-        'darkRed': pygame.Color(127, 0, 0),
-        'red': pygame.Color(255, 0, 0),
-        'lightRed': pygame.Color(255, 127, 127),
-        'darkGreen': pygame.Color(0, 127, 0),
-        'green': pygame.Color(0, 255, 0),
-        'lightGreen': pygame.Color(127, 255, 127),
-        'darkYellow': pygame.Color(127, 127, 0),
-        'yellow': pygame.Color(255, 255, 0),
-        'lightYellow': pygame.Color(255, 255, 127),
-        'darkBlue': pygame.Color(0, 0, 127),
-        'blue': pygame.Color(0, 0, 255),
-        'lightBlue': pygame.Color(127, 127, 255),
-        'darkMagenta': pygame.Color(127, 0, 127),
-        'magenta': pygame.Color(255, 0, 255),
-        'lightMagenta': pygame.Color(255, 127, 255),
-        'darkCyan': pygame.Color(0, 127, 127),
-        'cyan': pygame.Color(0, 255, 255),
-        'lightCyan': pygame.Color(127, 255, 255),
-        'black': pygame.Color(0, 0, 0),
-        'darkGrey': pygame.Color(64, 64, 64),
-        'grey': pygame.Color(127, 127, 127),
-        'white': pygame.Color(255, 255, 255)
+        "darkRed": pygame.Color(127, 0, 0),
+        "red": pygame.Color(255, 0, 0),
+        "lightRed": pygame.Color(255, 127, 127),
+        "darkGreen": pygame.Color(0, 127, 0),
+        "green": pygame.Color(0, 255, 0),
+        "lightGreen": pygame.Color(127, 255, 127),
+        "darkYellow": pygame.Color(127, 127, 0),
+        "yellow": pygame.Color(255, 255, 0),
+        "lightYellow": pygame.Color(255, 255, 127),
+        "darkBlue": pygame.Color(0, 0, 127),
+        "blue": pygame.Color(0, 0, 255),
+        "lightBlue": pygame.Color(127, 127, 255),
+        "darkMagenta": pygame.Color(127, 0, 127),
+        "magenta": pygame.Color(255, 0, 255),
+        "lightMagenta": pygame.Color(255, 127, 255),
+        "darkCyan": pygame.Color(0, 127, 127),
+        "cyan": pygame.Color(0, 255, 255),
+        "lightCyan": pygame.Color(127, 255, 255),
+        "black": pygame.Color(0, 0, 0),
+        "darkGrey": pygame.Color(64, 64, 64),
+        "grey": pygame.Color(127, 127, 127),
+        "white": pygame.Color(255, 255, 255)
     }
-    fontObj = pygame.font.Font('freesansbold.ttf', 32)
+    fontObj = pygame.font.Font("freesansbold.ttf", 32)
     mousex, mousey, mousexCoord, mouseyCoord = 0, 0, 0, 0
-    mouseColor = colors['red']
+    mouseColor = colors["red"]
     gridMain = [20, 40]
     livingCells = []
     livingCells.append(PlaceholdingClass.PlaceholdingClass())
-    mainWindowColors = (colors['grey'], colors['darkGrey'])
-    miniViewColors = (colors['darkGrey'], colors['grey'])
+    mainWindowColors = (colors["grey"], colors["darkGrey"])
+    miniViewColors = (colors["darkGrey"], colors["grey"])
     mouseIsDown = False
     removingCells = False
-    assure_cell_at(colors['magenta'], 2, 1)
-    assure_cell_at(colors['green'], 2, 2)
-    assure_cell_at(colors['blue'], 1, 2)
-    pygame.display.set_caption('Lyfe')
-    gameTimer = timer.Timer(colors['darkGreen'])
+    assure_cell_at(colors["magenta"], 2, 1)
+    assure_cell_at(colors["green"], 2, 2)
+    assure_cell_at(colors["blue"], 1, 2)
+    pygame.display.set_caption("Lyfe")
+    gameTimer = timer.Timer(colors["darkGreen"])
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import main
