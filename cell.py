@@ -23,15 +23,11 @@ class LivingCell(object):
                             (self.xCoord, self.yCoord + 1),
                             (self.xCoord + 1, self.yCoord + 1)])
 
-    def draw(self, dirtyList, window_object, width, xScale=1, yScale=1):
-        dirtyList.append(pygame.draw.rect(window_object, self.color,
-                                          ((self.xCoord * width + self.xCoord
-                                            + 1) * xScale,
-                                           (self.yCoord * width + self.yCoord
-                                            + 1) * yScale, width * xScale,
-                                           width * yScale)))
-        """pygame.draw.rect(mainWindow, colors["black"],
-            (i * choice + i + 1, j * choice + j + 1, choice, choice))"""
+    def draw(self, window_object, width, xScale=1, yScale=1):
+        pygame.draw.rect(window_object, self.color,
+                         ((self.xCoord * width + self.xCoord + 1) * xScale,
+                          (self.yCoord * width + self.yCoord + 1) * yScale,
+                          width * xScale, width * yScale))
     def change_color(self, color):
         self.color = color
 
@@ -39,7 +35,7 @@ class LivingCell(object):
         return((self.xCoord, self.yCoord))
 
     def set_coordinates(self, xCoord, yCoord=None):
-        if yCoord is not None:
+        if yCoord != None:
             self.xCoord = xCoord
             self.yCoord = yCoord
         else:

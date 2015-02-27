@@ -1,313 +1,498 @@
 import pygame
 from pygame.locals import *
+from constants import *
 import sys
 import os
 import random
 import math
 import types
 import cell
-import PlaceholdingClass
-import timer
+import time
 
 
-def assure_cell_at(color, xCoord, yCoord=None):
-    """Make certain a cell exists in the list with the coordinates."""
-    for livingCell in livingCells:
-        if yCoord is not None:
-            if livingCell.get_coordinates() == (xCoord, yCoord):
-                return True
-        elif livingCell.get_coordinates() == (xCoord[0], xCoord[1]):
-            return True
-    if yCoord is not None:
-        livingCells.append(cell.LivingCell(xCoord, yCoord, color))
-        return False
-    else:
-        livingCells.append(cell.LivingCell(xCoord[0], xCoord[1], color))
-        return False
+prefix = ""
+with open("debugFile.txt", "w") as debugFile:
+    debugFile.writelines(time.strftime('%c') + "\n")
+
+with open("debugFile.txt", "a") as debugFile:
+    debugFile.writelines(prefix + str(None) + "\n")
+
+timeIndex = time.time()
+ultimateIndex = time.time()
+
+t_is_cell_at = [0, 0]
+t_make_cell_at = [0, 0]
+t_assure_cell_at = [0, 0]
+t_remove_cell_at = [0, 0]
+t_determine_variables = [0, 0]
+t_deal_w_game_time = [0, 0]
+t_deal_w_making_deleting_cells = [0, 0]
+t_care_for_cells = [0, 0]
+t_generation = [0, 0]
+t_boring_beginning_of_loop_stuff = [0, 0]
+t_boring_end_of_loop_stuff = [0, 0]
+t_draw_grid = [0, 0]
+t_draw_cells = [0, 0]
+t_draw_views = [0, 0]
+t_check_events = [0, 0]
 
 
-def is_cell_at(xCoord, yCoord=None):
+def is_cell_at(x_coord, y_coord=None):
     """return whether or not a cell with given coordinates exists."""
-    for livingCell in livingCells:
-        if yCoord is not None:
-            if livingCell.get_coordinates() == (xCoord, yCoord):
-                return True
-        elif livingCell.get_coordinates() == (xCoord[0], xCoord[1]):
-            return True
-    return False
+    global t_is_cell_at, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering is_cell_at!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    if y_coord != None:
+        for i in range(len(living_cells)):
+            if living_cells[i].get_coordinates() == (x_coord, y_coord):
+                prefix = prefix[:-2]
+                with open("debugFile.txt", "a") as debugFile:
+                    debugFile.writelines(prefix + "is_cell_at(%s, %s) took %s seconds\n"
+                                         % (x_coord, y_coord, time.time() -
+                                            timeIndex))
+                t_is_cell_at[0] += time.time() - timeIndex
+                t_is_cell_at[1] += 1
+                return i
+    else:
+        for i in range(len(living_cells)):
+            if living_cells[i].get_coordinates() == (x_coord[0], x_coord[1]):
+                prefix = prefix[:-2]
+                with open("debugFile.txt", "a") as debugFile:
+                    debugFile.writelines(prefix + "is_cell_at(%s, %s) took %s seconds\n"
+                                         % (x_coord[0], x_coord[1], time.time()
+                                            - timeIndex))
+                t_is_cell_at[0] += time.time() - timeIndex
+                t_is_cell_at[1] += 1
+                return i
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "is_cell_at(%s, %s) took %s seconds\n"
+                             % (x_coord, y_coord, time.time() - timeIndex))
+    t_is_cell_at[0] += time.time() - timeIndex
+    t_is_cell_at[1] += 1
+    return None
 
 
-def remove_cell_at(xCoord, yCoord=None):
+def make_cell_at(color, x_coord, y_coord=None):
+    global t_make_cell_at, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering make_cell_at!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    if y_coord != None:
+        with open("debugFile.txt", "a") as debugFile:
+            debugFile.writelines(prefix + str("added cell at %s, %s" %
+                                              (x_coord, y_coord)) + "\n")
+        dirty_rects.append(Rect((x_coord, y_coord), (choice, choice)))
+        living_cells.append(cell.LivingCell(x_coord, y_coord, color))
+        prefix = prefix[:-2]
+        with open("debugFile.txt", "a") as debugFile:
+            debugFile.writelines(prefix + "make_cell_at() took %s seconds\n"
+                                 % (time.time() - timeIndex))
+        t_make_cell_at[0] += time.time() - timeIndex
+        t_make_cell_at[1] += 1
+        return
+    else:
+        with open("debugFile.txt", "a") as debugFile:
+            debugFile.writelines(prefix + str("added cell at %s, %s" %
+                                              (x_coord[0], x_coord[1])) + "\n")
+        dirty_rects.append(Rect((x_coord[0], x_coord[1]), (choice, choice)))
+        living_cells.append(cell.LivingCell(x_coord[0], x_coord[1], color))
+        prefix = prefix[:-2]
+        with open("debugFile.txt", "a") as debugFile:
+            debugFile.writelines(prefix + "added_cell_at() took %s seconds\n"
+                                 % (time.time() - timeIndex))
+        t_make_cell_at[0] += time.time() - timeIndex
+        t_make_cell_at[1] += 1
+
+
+def assure_cell_at(color, x_coord, y_coord=None):
+    """Make certain a cell exists in the list with the coordinates."""
+    global t_assure_cell_at, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering assure_cell_at!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    if is_cell_at(x_coord, y_coord):
+        prefix = prefix[:-2]
+        with open("debugFile.txt", "a") as debugFile:
+            debugFile.writelines(prefix + "assure_cell_at() took %s seconds\n"
+                                 % (time.time() - timeIndex))
+        t_assure_cell_at[0] += time.time() - timeIndex
+        t_assure_cell_at[1] += 1
+        return
+    make_cell_at(color, x_coord, y_coord)
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("assure_cell_at() took %s seconds" %
+                                          (time.time() - timeIndex)) + "\n")
+
+
+def remove_cell_at(x_coord, y_coord=None):
     """remove the cell at given coordinates"""
-    index = None
-    for i in range(len(livingCells)):
-        if yCoord is not None:
-            if livingCells[i].get_coordinates() == (xCoord, yCoord):
-                index = i
-        elif livingCells[i].get_coordinates() == (xCoord[0], xCoord[1]):
-            index = i
+    global t_remove_cell_at, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering remove_cell_at!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    index = is_cell_at(x_coord, y_coord)
     if index:
-        del(livingCells[index])
+        dirty_rects.append(Rect(living_cells[index].get_coordinates(),
+                                (choice, choice)))
+        del(living_cells[index])
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("remove_cell_at() took %s seconds" %
+                                          (time.time() - timeIndex)) + "\n")
+    t_remove_cell_at[0] += time.time() - timeIndex
+    t_remove_cell_at[1] += 1
 
 
 def determine_variables():
-    global choice, width, height, mousexCoord, mouseyCoord, livingCells
-    global population, check_needs
+    global choice, grid_width, grid_height, mousex_coord, mousey_coord
+    global population, check_needs, living_cells
+    global t_determine_variables, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "Entering determine_variables!\n")
+    prefix += "  "
+    timeIndex = time.time()
     if check_needs["population"]:
-        population = len(livingCells) - 1
+        population = len(living_cells) - 1
         check_needs["population"] = False
-    width = (windowDimensions[0] - gridMain[0] - 1) / float(gridMain[0])
-    height = (windowDimensions[1] - gridMain[1] - 1) / float(gridMain[1])
-    #print(width, height)
-    choice = max(width, height)
-    mousexCoord = int(mousex / (choice + 1))
-    mouseyCoord = int(mousey / (choice + 1))
+    grid_width = (window_dimensions[0] -
+                  grid_main[0] - 1) / float(grid_main[0])
+    grid_height = (window_dimensions[1] -
+                   grid_main[1] - 1) / float(grid_main[1])
+    #print(grid_width, grid_height)
+    choice = max(grid_width, grid_height)
+    mousex_coord = int(mousex / (choice + 1))
+    mousey_coord = int(mousey / (choice + 1))
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "determine_variables() took %s seconds\n"
+                             % (time.time() - timeIndex))
+    t_determine_variables[0] += time.time() - timeIndex
+    t_determine_variables[1] += 1
 
 
 def deal_w_game_time():
-    global readyToGenerate, gameTimer
-    readyToGenerate = gameTimer.update_portion(math.pi / 20)
-    gameTimer.draw(dirtyRects, mainWindow, (windowDimensions[0] - 60,
-                                            windowDimensions[1] - 60), 50)
+    global ready_to_generate, game_timer
+    global t_deal_w_game_time, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "Entering deal_w_game_time!\n")
+    prefix += "  "
+    timeIndex = time.time()
+    ready_to_generate = game_timer.update_portion(math.pi / 10)
+    dirty_rects.append(Rect((values_view.get_width() - 60,
+                                  values_view.get_height() - 60), (50, 50)))
+    game_timer.draw(values_view, (values_view.get_width() - 60,
+                                  values_view.get_height() - 60), 50)
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "deal_w_game_time() took %s seconds\n"
+                             % (time.time() - timeIndex))
+    t_deal_w_game_time[0] += time.time() - timeIndex
+    t_deal_w_game_time[1] += 1
 
 
 def deal_w_making_deleting_cells():
     global check_needs
-    if mouseIsDown:
-        if removingCells:
-            remove_cell_at(mousexCoord, mouseyCoord)
+    global t_deal_w_making_deleting_cells, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "Entering deal_w_making_deleting_cells!\n")
+    prefix += "  "
+    timeIndex = time.time()
+    if mouse_is_down:
+        if removing_cells:
+            remove_cell_at(mousex_coord, mousey_coord)
             check_needs["population"] = True
         else:
-            assure_cell_at(mouseColor, int(mousex / (choice + 1)),
+            assure_cell_at(mouse_color, int(mousex / (choice + 1)),
                            int(mousey / (choice + 1)))
             check_needs["population"] = True
-            check_needs["population"] = True
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "deal_w_making_deleting_cells() took %s seconds"
+                             % (time.time() - timeIndex))
+    t_deal_w_making_deleting_cells[0] += time.time() - timeIndex
+    t_deal_w_making_deleting_cells[1] += 1
 
 
 def care_for_cells():
-    if len(livingCells) > 1:
-        xMin = livingCells[1].get_coordinates()[0]
+    global t_care_for_cells, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering care_for_cells!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    if len(living_cells) > 1:
+        xMin = living_cells[1].get_coordinates()[0]
         xMax = xMin
-        yMin = livingCells[1].get_coordinates()[1]
+        yMin = living_cells[1].get_coordinates()[1]
         yMax = yMin
-        for i in range(len(livingCells) - 1):
-            xMin = min(xMin, livingCells[i + 1].get_coordinates()[0])
-            xMax = max(xMax, livingCells[i + 1].get_coordinates()[0])
-            yMin = min(yMin, livingCells[i + 1].get_coordinates()[1])
-            yMax = max(yMax, livingCells[i + 1].get_coordinates()[1])
+        for i in range(len(living_cells) - 1):
+            xMin = min(xMin, living_cells[i + 1].get_coordinates()[0])
+            xMax = max(xMax, living_cells[i + 1].get_coordinates()[0])
+            yMin = min(yMin, living_cells[i + 1].get_coordinates()[1])
+            yMax = max(yMax, living_cells[i + 1].get_coordinates()[1])
         if xMin < 0:
             if yMin < 0:
-                for i in range(len(livingCells) - 1):
-                    livingCells[i + 1].set_coordinates(livingCells[i + 1].
-                                                       get_coordinates()[0] -
-                                                       xMin, livingCells[i + 1]
-                                                       .get_coordinates()[1] -
-                                                       yMin)
+                for i in range(len(living_cells) - 1):
+                    living_cells[i + 1].set_coordinates(living_cells[i + 1].
+                                                        get_coordinates()[0] -
+                                                        xMin, living_cells[i +
+                                                        1].get_coordinates()[1]
+                                                        - yMin)
             else:
-                for i in range(len(livingCells) - 1):
-                    livingCells[i + 1].set_coordinates(livingCells[i + 1].
-                                                       get_coordinates()[0] -
-                                                       xMin, livingCells[i + 1]
-                                                       .get_coordinates()[1])
+                for i in range(len(living_cells) - 1):
+                    living_cells[i + 1].set_coordinates(living_cells[i + 1].
+                                                        get_coordinates()[0] -
+                                                        xMin, living_cells[i +
+                                                        1].
+                                                        get_coordinates()[1])
         elif yMin < 0:
-            for i in range(len(livingCells) - 1):
-                livingCells[i + 1].set_coordinates(livingCells[i + 1].
-                                                   get_coordinates()[0],
-                                                   livingCells[i + 1]
-                                                   .get_coordinates()[1] -
-                                                   yMin)
+            for i in range(len(living_cells) - 1):
+                living_cells[i + 1].set_coordinates(living_cells[i + 1].
+                                                    get_coordinates()[0],
+                                                    living_cells[i + 1]
+                                                    .get_coordinates()[1] -
+                                                    yMin)
         if xMax > choice:
             pass
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("care_for_cells() took %s seconds" %
+                                          (time.time() - timeIndex)) + "\n")
+    t_care_for_cells[0] += time.time() - timeIndex
+    t_care_for_cells[1] += 1
 
 
 def generation():
-    global readyToGenerate, check_needs
-    readyToGenerate = False
+    global ready_to_generate, check_needs
+    global t_generation, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering generation!") + "\n")
+    count_remove = 0
+    count_make = 0
+    prefix += "  "
+    timeIndex = time.time()
+    ready_to_generate = False
     check_needs["population"] = True
-    generationDict = {}
-    for livingCell in livingCells:
-        if livingCell.give_to_neighbors():
-            color = livingCell.give_to_neighbors()[0]
-            for coordinatePair in livingCell.give_to_neighbors()[1]:
-                if coordinatePair in generationDict.keys():
-                    generationDict[coordinatePair].append(color)
+    generation_dict = {}
+    for living_cell in living_cells:
+        if living_cell.give_to_neighbors():
+            color = living_cell.give_to_neighbors()[0]
+            for coordinate_pair in living_cell.give_to_neighbors()[1]:
+                if coordinate_pair in generation_dict.keys():
+                    generation_dict[coordinate_pair].append(color)
                 else:
-                    generationDict[coordinatePair] = [color]
-            if not livingCell.get_coordinates() in generationDict.keys():
-                generationDict[livingCell.get_coordinates()] = []
-    for coordinatePair in generationDict.keys():
-        if is_cell_at(coordinatePair):
-            if(len(generationDict[coordinatePair]) < 2 or len(generationDict[
-                    coordinatePair]) > 3):
-                remove_cell_at(coordinatePair)
-        elif len(generationDict[coordinatePair]) == 3:
-            count = generationDict[coordinatePair].count(
-                max(generationDict[coordinatePair], key=generationDict[
-                    coordinatePair].count))
+                    generation_dict[coordinate_pair] = [color]
+            if not living_cell.get_coordinates() in generation_dict.keys():
+                generation_dict[living_cell.get_coordinates()] = []
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Halfway generated at %s seconds!" %
+                                          (time.time() - timeIndex)) + "\n")
+    for coordinate_pair in generation_dict.keys():
+        len_gen_dict = len(generation_dict[coordinate_pair])
+        if len_gen_dict < 2 or len_gen_dict > 3:
+            count_remove += 1
+            remove_cell_at(coordinate_pair)
+        elif len_gen_dict == 3:
+            count_make += 1
+            count = generation_dict[coordinate_pair].count(
+                max(generation_dict[coordinate_pair], key=generation_dict[
+                    coordinate_pair].count))
             if count > 1:
                 color = max(
-                    generationDict[coordinatePair], key=generationDict[
-                        coordinatePair].count)
+                    generation_dict[coordinate_pair], key=generation_dict[
+                        coordinate_pair].count)
             else:
-                color = random.choice(generationDict[coordinatePair])
-            assure_cell_at(color, coordinatePair)
+                color = random.choice(generation_dict[coordinate_pair])
+            with open("debugFile.txt", "a") as debugFile:
+                debugFile.writelines(prefix + str("Made it to here!") + "\n")
+            assure_cell_at(color, coordinate_pair)
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "generation() took %s seconds; remove: %s, make: %s\n"
+                             % (time.time() - timeIndex, count_remove,
+                                count_make))
+    t_generation[0] += time.time() - timeIndex
+    t_generation[1] += 1
 
 
 def boring_beginning_of_loop_stuff():
-    global readyToGenerate, dirtyRects, soundObj
-    dirtyRects = []
-    pygame.transform.flip(mainWindow, True, True)
-    mainWindow.fill(mainWindowColors[0])
-    miniView.fill(miniViewColors[0])
-    if readyToGenerate:
+    global ready_to_generate, dirty_rects, sound_obj, ultimateIndex
+    global t_boring_beginning_of_loop_stuff, prefix, pop_msg, pop_msg_rect
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering boring_beginning_of_loop_stuff!")
+                             + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str(time.time() - ultimateIndex) +
+                             "\n\n")
+    ultimateIndex = time.time()
+    dirty_rects = []#pop_msg_rect]
+    grid_view.fill(grid_view_colors[0])
+    mini_view.fill(mini_view_colors[0])
+    values_view.fill(values_view_colors[0])
+    if ready_to_generate:
         generation()
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "boring_beginning_of_loop_stuff() took %s seconds\n"
+                             % (time.time() - timeIndex))
+    t_boring_beginning_of_loop_stuff[0] += time.time() - timeIndex
+    t_boring_beginning_of_loop_stuff[1] += 1
 
 
 def boring_end_of_loop_stuff():
-    pygame.transform.flip(mainWindow, True, True)
-    pygame.transform.flip(miniView, True, True)
-    pygame.display.update(dirtyRects)
-    fpsClock.tick(30)
+    global t_boring_end_of_loop_stuff, prefix, dirty_rects
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering boring_end_of_loop_stuff!")
+                                          + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    if dirty_rects != []:
+        with open("debugFile.txt", "a") as debugFile:
+            debugFile.writelines(prefix + str(dirty_rects) + "\n")
+    dirty_rects = [Rect(1, 1, 1, 1)]
+    pygame.display.update(dirty_rects)
+    fps_clock.tick(30)
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "boring_end_of_loop_stuff() took %s seconds\n"
+                             % (time.time() - timeIndex))
+    t_boring_end_of_loop_stuff[0] += time.time() - timeIndex
+    t_boring_end_of_loop_stuff[1] += 1
 
 
 def draw_grid():
-    for i in range(gridMain[0]):
-        for j in range(gridMain[1]):
-            pygame.draw.rect(mainWindow, mainWindowColors[1],
+    global t_draw_grid, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering draw_grid!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    for i in range(grid_main[0]):
+        for j in range(grid_main[1]):
+            pygame.draw.rect(grid_view, grid_view_colors[1],
                              (i * choice + i + 1, j * choice + j + 1, choice,
                               choice))
-            pygame.draw.rect(miniView, miniViewColors[1], ((i * choice + i + 1)
-                                                           * coef, (j * choice
-                                                                    + j + 1) *
-                                                           coef, choice * coef,
-                                                           choice * coef))
+            pygame.draw.rect(mini_view, mini_view_colors[1],
+                             ((i * choice + i + 1) * coef, (j * choice + j + 1)
+                              * coef, choice * coef, choice * coef))
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("draw_grid() took %s seconds" %
+                                          (time.time() - timeIndex)) + "\n")
+    t_draw_grid[0] += time.time() - timeIndex
+    t_draw_grid[1] += 1
 
 
 def draw_cells():
-    global population, fontObj
-    for livingCell in livingCells:
-        livingCell.draw(dirtyRects, mainWindow, choice)
-        livingCell.draw(dirtyRects, miniView, choice, coef, coef)
-    popMsg = fontObj.render(str(population), False, colors["lightBlue"])
-    popMsgRect = popMsg.get_rect()
-    popMsgRect.topleft = (10, 200)
-    mainWindow.blit(popMsg, popMsgRect)
+    global population, font_obj, pop_msg_rect
+    global t_draw_cells, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering draw_cells!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    for living_cell in living_cells:
+        living_cell.draw(grid_view, choice)
+        living_cell.draw(mini_view, choice, coef, coef)
+    pop_msg = font_obj.render(str(population), False, colors["light blue"])
+    pop_msg_rect = pop_msg.get_rect()
+    pop_msg_rect.topleft = (0, 0)
+    values_view.blit(pop_msg, pop_msg_rect)
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("draw_cells() took %s seconds" %
+                                          (time.time() - timeIndex)) + "\n")
+    t_draw_cells[0] += time.time() - timeIndex
+    t_draw_cells[1] += 1
 
 
-def draw_mini_view():
-    mainWindow.blit(miniView, (windowDimensions[0] - miniView.get_width(), 0))
+def draw_views():
+    global t_draw_views, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering draw_views!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    main_window.blit(grid_view, (0, 0))
+    main_window.blit(mini_view, (window_dimensions[0] -
+                                 mini_view.get_width(), 0))
+    main_window.blit(values_view, (window_dimensions[0] -
+                                   mini_view.get_width(),
+                                   mini_view.get_height()))
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("draw_views() took %s seconds" %
+                                          (time.time() - timeIndex)) + "\n")
+    t_draw_views[0] += time.time() - timeIndex
+    t_draw_views[1] += 1
 
 
 def check_events():
-    global mousex, mousey, removingCells, mouseIsDown, colors, mouseColor
-    global songOrder, music_index_var
+    # global mousex, mousey, removing_cells, mouse_is_down, colors, mouse_color
+    # global song_order, music_index_var
+    global mousex, mousey, mouse_is_down, removing_cells, mouse_color
+    global t_check_events, prefix, music_index_var
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering check_events!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
     for event in pygame.event.get():
         if event.type == QUIT:
+            with open("debugFile.txt", "a") as debugFile:
+                debugFile.writelines(prefix +
+                                     str("totals:\nt_is_cell_at: %s\nt_assure_cell_at: %s\nt_remove_cell_at: %s\nt_determine_variables: %s\nt_deal_w_game_time: %s\nt_deal_w_making_deleting_cells: %s\nt_care_for_cells: %s\nt_generation: %s\nt_boring_beginning_of_loop_stuff: %s\nt_boring_end_of_loop_stuff: %s\nt_draw_grid: %s,\nt_draw_cells: %s\nt_draw_views: %s\nt_check_events: %s\n" %
+                                         (t_is_cell_at, t_assure_cell_at,
+                                          t_remove_cell_at,
+                                          t_determine_variables,
+                                          t_deal_w_game_time,
+                                          t_deal_w_making_deleting_cells,
+                                          t_care_for_cells, t_generation,
+                                          t_boring_beginning_of_loop_stuff,
+                                          t_boring_end_of_loop_stuff,
+                                          t_draw_grid, t_draw_cells,
+                                          t_draw_views, t_check_events) +
+                                          "\n"))
+
             pygame.quit()
             sys.exit()
         elif event.type == MOUSEMOTION:
             mousex, mousey = event.pos
         elif event.type == MOUSEBUTTONDOWN:
-            mouseIsDown = True
-            removingCells = is_cell_at(int(mousex / (choice + 1)),
-                                       int(mousey / (choice + 1)))
+            mouse_is_down = True
+            removing_cells = bool(is_cell_at(int(mousex / (choice + 1)),
+                                             int(mousey / (choice + 1))))
         elif event.type == MOUSEBUTTONUP:
             mousex, mousey = event.pos
-            mouseIsDown = False
+            mouse_is_down = False
         elif event.type == KEYDOWN:
             if event.key == (K_y):
-                mouseColor = colors["green"]
+                mouse_color = colors["green"]
             if event.key == (K_h):
-                mouseColor = colors[random.choice(colors.keys())]
+                mouse_color = colors[random.choice(colors.keys())]
             if event.key == K_LEFT:
-                gridMain[0] -= 1
+                grid_main[0] -= 1
             if event.key == K_RIGHT:
-                gridMain[0] += 1
+                grid_main[0] += 1
             if event.key == K_UP:
-                gridMain[1] -= 1
+                grid_main[1] -= 1
             if event.key == K_DOWN:
-                gridMain[1] += 1
+                grid_main[1] += 1
             if event.key == K_ESCAPE:
                 pygame.event.post(pygame.event.Event(QUIT))
         elif event.type == MUSIC_HAS_ENDED:
-            pygame.mixer.music.queue(songOrder[music_index_var %
-                                               len(songOrder)])
-            print songOrder[music_index_var % len(songOrder)]
+            pygame.mixer.music.queue(song_order[music_index_var %
+                                               len(song_order)])
+            print song_order[music_index_var % len(song_order)]
             music_index_var += 1
-            print songOrder[music_index_var % len(songOrder)]
-
-
-def _game_init_():
-    global coef, colors, mousex, mousey, fpsClock, gridMain, miniView
-    global mainWindow, livingCells, mouseIsDown, mousexCoord, mouseyCoord
-    global miniViewColors, readyToGenerate, mainWindowColors, population
-    global windowDimensions, dirtyRects, gameTimer, mouseColor, fontObj
-    global check_needs, backgroundMusic, MUSIC_HAS_ENDED, music_index_var
-    global songOrder
-    music_index_var = 0
-    MUSIC_HAS_ENDED = 18
-    check_needs = {"population": False}
-    population = 0
-    dirtyRects = []
-    coef = 1. / 4.
-    pygame.init()
-    fpsClock = pygame.time.Clock()
-    readyToGenerate = False
-    windowDimensions = (0, 0)
-    mainWindow = pygame.display.set_mode(windowDimensions, pygame.FULLSCREEN)
-    windowDimensions = (mainWindow.get_size())
-    miniView = pygame.Surface(
-        (windowDimensions[0] * coef, windowDimensions[1] * coef))
-    musicDirectory = "music/The Caledonian Club/"
-    songs = [(musicDirectory + song) for song in os.listdir(musicDirectory) if
-             song[-3] is "m"]
-    print songs
-    print song, " " is " ", song[-3:] is song[-3:]
-    songOrder = random.sample(songs, len(songs))
-    pygame.mixer.music.load(songOrder[len(songs) - 1])
-    pygame.mixer.music.play()
-    pygame.mixer.music.set_endevent(MUSIC_HAS_ENDED)
-    pygame.mixer.music.queue(songOrder[music_index_var % 18])
-    music_index_var += 1
-    colors = {
-        "darkRed": pygame.Color(127, 0, 0),
-        "red": pygame.Color(255, 0, 0),
-        "lightRed": pygame.Color(255, 127, 127),
-        "darkGreen": pygame.Color(0, 127, 0),
-        "green": pygame.Color(0, 255, 0),
-        "lightGreen": pygame.Color(127, 255, 127),
-        "darkYellow": pygame.Color(127, 127, 0),
-        "yellow": pygame.Color(255, 255, 0),
-        "lightYellow": pygame.Color(255, 255, 127),
-        "darkBlue": pygame.Color(0, 0, 127),
-        "blue": pygame.Color(0, 0, 255),
-        "lightBlue": pygame.Color(127, 127, 255),
-        "darkMagenta": pygame.Color(127, 0, 127),
-        "magenta": pygame.Color(255, 0, 255),
-        "lightMagenta": pygame.Color(255, 127, 255),
-        "darkCyan": pygame.Color(0, 127, 127),
-        "cyan": pygame.Color(0, 255, 255),
-        "lightCyan": pygame.Color(127, 255, 255),
-        "black": pygame.Color(0, 0, 0),
-        "darkGrey": pygame.Color(64, 64, 64),
-        "grey": pygame.Color(127, 127, 127),
-        "white": pygame.Color(255, 255, 255)
-    }
-    fontObj = pygame.font.Font("freesansbold.ttf", 32)
-    mousex, mousey, mousexCoord, mouseyCoord = 0, 0, 0, 0
-    mouseColor = colors["red"]
-    gridMain = [20, 40]
-    livingCells = []
-    livingCells.append(PlaceholdingClass.PlaceholdingClass())
-    mainWindowColors = (colors["grey"], colors["darkGrey"])
-    miniViewColors = (colors["darkGrey"], colors["grey"])
-    mouseIsDown = False
-    removingCells = False
-    assure_cell_at(colors["magenta"], 2, 1)
-    assure_cell_at(colors["green"], 2, 2)
-    assure_cell_at(colors["blue"], 1, 2)
-    pygame.display.set_caption("Lyfe")
-    gameTimer = timer.Timer(colors["darkGreen"])
-
-if __name__ == "__main__":
-    import main
+            print song_order[music_index_var % len(song_order)]
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("check_events() took %s seconds" %
+                                          (time.time() - timeIndex)) + "\n")
+    t_check_events[0] += time.time() - timeIndex
+    t_check_events[1] += 1
