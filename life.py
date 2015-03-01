@@ -37,35 +37,23 @@ t_draw_views = [0, 0]
 t_check_events = [0, 0]
 
 
-def is_cell_at(x_coord, y_coord=None):
+def is_cell_at(x_coord, y_coord):
     """return whether or not a cell with given coordinates exists."""
     global t_is_cell_at, prefix
     with open("debugFile.txt", "a") as debugFile:
         debugFile.writelines(prefix + str("Entering is_cell_at!") + "\n")
     prefix += "  "
     timeIndex = time.time()
-    if y_coord != None:
-        for i in range(len(living_cells)):
-            if living_cells[i].get_coordinates() == (x_coord, y_coord):
-                prefix = prefix[:-2]
-                with open("debugFile.txt", "a") as debugFile:
-                    debugFile.writelines(prefix + "is_cell_at(%s, %s) took %s seconds\n"
-                                         % (x_coord, y_coord, time.time() -
-                                            timeIndex))
-                t_is_cell_at[0] += time.time() - timeIndex
-                t_is_cell_at[1] += 1
-                return i
-    else:
-        for i in range(len(living_cells)):
-            if living_cells[i].get_coordinates() == (x_coord[0], x_coord[1]):
-                prefix = prefix[:-2]
-                with open("debugFile.txt", "a") as debugFile:
-                    debugFile.writelines(prefix + "is_cell_at(%s, %s) took %s seconds\n"
-                                         % (x_coord[0], x_coord[1], time.time()
-                                            - timeIndex))
-                t_is_cell_at[0] += time.time() - timeIndex
-                t_is_cell_at[1] += 1
-                return i
+    for i in range(len(living_cells)):
+        if living_cells[i].get_coordinates() == (x_coord, y_coord):
+            prefix = prefix[:-2]
+            with open("debugFile.txt", "a") as debugFile:
+                debugFile.writelines(prefix + "is_cell_at(%s, %s) took %s seconds\n"
+                                     % (x_coord, y_coord, time.time() -
+                                        timeIndex))
+            t_is_cell_at[0] += time.time() - timeIndex
+            t_is_cell_at[1] += 1
+            return i
     prefix = prefix[:-2]
     with open("debugFile.txt", "a") as debugFile:
         debugFile.writelines(prefix + "is_cell_at(%s, %s) took %s seconds\n"
@@ -75,40 +63,27 @@ def is_cell_at(x_coord, y_coord=None):
     return None
 
 
-def make_cell_at(color, x_coord, y_coord=None):
+def make_cell_at(color, x_coord, y_coord):
     global t_make_cell_at, prefix
     with open("debugFile.txt", "a") as debugFile:
         debugFile.writelines(prefix + str("Entering make_cell_at!") + "\n")
     prefix += "  "
     timeIndex = time.time()
-    if y_coord != None:
-        with open("debugFile.txt", "a") as debugFile:
-            debugFile.writelines(prefix + str("added cell at %s, %s" %
-                                              (x_coord, y_coord)) + "\n")
-        dirty_rects.append(Rect((x_coord, y_coord), (choice, choice)))
-        living_cells.append(cell.LivingCell(x_coord, y_coord, color))
-        prefix = prefix[:-2]
-        with open("debugFile.txt", "a") as debugFile:
-            debugFile.writelines(prefix + "make_cell_at() took %s seconds\n"
-                                 % (time.time() - timeIndex))
-        t_make_cell_at[0] += time.time() - timeIndex
-        t_make_cell_at[1] += 1
-        return
-    else:
-        with open("debugFile.txt", "a") as debugFile:
-            debugFile.writelines(prefix + str("added cell at %s, %s" %
-                                              (x_coord[0], x_coord[1])) + "\n")
-        dirty_rects.append(Rect((x_coord[0], x_coord[1]), (choice, choice)))
-        living_cells.append(cell.LivingCell(x_coord[0], x_coord[1], color))
-        prefix = prefix[:-2]
-        with open("debugFile.txt", "a") as debugFile:
-            debugFile.writelines(prefix + "added_cell_at() took %s seconds\n"
-                                 % (time.time() - timeIndex))
-        t_make_cell_at[0] += time.time() - timeIndex
-        t_make_cell_at[1] += 1
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("added cell at %s, %s" %
+                                          (x_coord, y_coord)) + "\n")
+    dirty_rects.append(Rect((x_coord, y_coord), (choice, choice)))
+    living_cells.append(cell.LivingCell(x_coord, y_coord, color))
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "make_cell_at() took %s seconds\n"
+                             % (time.time() - timeIndex))
+    t_make_cell_at[0] += time.time() - timeIndex
+    t_make_cell_at[1] += 1
+    return
 
 
-def assure_cell_at(color, x_coord, y_coord=None):
+def assure_cell_at(color, x_coord, y_coord):
     """Make certain a cell exists in the list with the coordinates."""
     global t_assure_cell_at, prefix
     with open("debugFile.txt", "a") as debugFile:
@@ -130,7 +105,7 @@ def assure_cell_at(color, x_coord, y_coord=None):
                                           (time.time() - timeIndex)) + "\n")
 
 
-def remove_cell_at(x_coord, y_coord=None):
+def remove_cell_at(x_coord, y_coord):
     """remove the cell at given coordinates"""
     global t_remove_cell_at, prefix
     with open("debugFile.txt", "a") as debugFile:
@@ -297,7 +272,7 @@ def generation():
         len_gen_dict = len(generation_dict[coordinate_pair])
         if len_gen_dict < 2 or len_gen_dict > 3:
             count_remove += 1
-            remove_cell_at(coordinate_pair)
+            remove_cell_at(coordinate_pair[0], coordinate_pair[1])
         elif len_gen_dict == 3:
             count_make += 1
             count = generation_dict[coordinate_pair].count(
@@ -311,7 +286,7 @@ def generation():
                 color = random.choice(generation_dict[coordinate_pair])
             with open("debugFile.txt", "a") as debugFile:
                 debugFile.writelines(prefix + str("Made it to here!") + "\n")
-            assure_cell_at(color, coordinate_pair)
+            assure_cell_at(color, coordinate_pair[0], coordinate_pair[1])
     prefix = prefix[:-2]
     with open("debugFile.txt", "a") as debugFile:
         debugFile.writelines(prefix + "generation() took %s seconds; remove: %s, make: %s\n"
