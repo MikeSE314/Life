@@ -1,13 +1,13 @@
-import pyLife
+import life
 
 while True:
-    pyLife.boring_beginning_of_loop_stuff()
-    pyLife.determine_variables()
-    pyLife.draw_grid()
-    pyLife.draw_cells()
-    pyLife.deal_w_game_time()
-    pyLife.care_for_cells()
-    pyLife.draw_views()
-    pyLife.check_events()
-    pyLife.deal_w_making_deleting_cells()
-    pyLife.boring_end_of_loop_stuff()
+    life.boring_beginning_of_loop_stuff()
+    life.determine_variables()
+    life.draw_grid()
+    life.draw_cells()
+    life.deal_w_game_time()
+    life.care_for_cells()
+    life.draw_views()
+    life.check_events()
+    life.deal_w_making_deleting_cells()
+    life.boring_end_of_loop_stuff()

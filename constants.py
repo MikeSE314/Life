@@ -1,7 +1,7 @@
 import pygame
 import os
 import random
-from colors import colors
+from colors import *
 import PlaceholdingClass
 import timer
 
@@ -42,6 +42,9 @@ pop_msg_rect = pop_msg.get_rect()
 pop_msg_rect.topleft = (0, 0)
 mousex, mousey, mousex_coord, mousey_coord = 0, 0, 0, 0
 mouse_color = colors["red"]
+color_msg = font_obj.render(str(mouse_color), False, colors["light blue"])
+color_msg_rect = color_msg.get_rect()
+color_msg_rect.topleft = (0, 40)
 grid_main = [60, 40]
 living_cells = []
 living_cells.append(PlaceholdingClass.PlaceholdingClass())

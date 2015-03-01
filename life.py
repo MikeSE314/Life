@@ -358,7 +358,8 @@ def boring_end_of_loop_stuff():
         with open("debugFile.txt", "a") as debugFile:
             debugFile.writelines(prefix + str(dirty_rects) + "\n")
     dirty_rects = [Rect(1, 1, 1, 1)]
-    pygame.display.update(dirty_rects)
+    # pygame.display.update(dirty_rects)
+    pygame.display.flip()
     fps_clock.tick(30)
     prefix = prefix[:-2]
     with open("debugFile.txt", "a") as debugFile:
@@ -391,7 +392,7 @@ def draw_grid():
 
 
 def draw_cells():
-    global population, font_obj, pop_msg_rect
+    global population, font_obj, pop_msg_rect, color_msg_rect
     global t_draw_cells, prefix
     with open("debugFile.txt", "a") as debugFile:
         debugFile.writelines(prefix + str("Entering draw_cells!") + "\n")
@@ -401,9 +402,13 @@ def draw_cells():
         living_cell.draw(grid_view, choice)
         living_cell.draw(mini_view, choice, coef, coef)
     pop_msg = font_obj.render(str(population), False, colors["light blue"])
+    color_msg = font_obj.render(str(reverse_colors[mouse_color]), False, colors["light blue"])
     pop_msg_rect = pop_msg.get_rect()
+    color_msg_rect = color_msg.get_rect()
     pop_msg_rect.topleft = (0, 0)
+    color_msg_rect.topleft = (0, 40)
     values_view.blit(pop_msg, pop_msg_rect)
+    values_view.blit(color_msg, color_msg_rect)
     prefix = prefix[:-2]
     with open("debugFile.txt", "a") as debugFile:
         debugFile.writelines(prefix + str("draw_cells() took %s seconds" %
