@@ -1,5 +1,6 @@
 import life
 
+
 while True:
     life.boring_beginning_of_loop_stuff()
     life.determine_variables()
