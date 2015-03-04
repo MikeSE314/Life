@@ -9,6 +9,7 @@ import types
 import cell
 
 
+<<<<<<< HEAD
 def is_cell_at(coordinate_key):
     """return whether or not a cell with given coordinates exists."""
     for cell_key in living_cells.keys():
@@ -25,13 +26,93 @@ def make_cell_at(color, coordinate_key):
 
 
 def assure_cell_at(color, coordinate_key):
+=======
+prefix = ""
+with open("debugFile.txt", "w") as debugFile:
+    debugFile.writelines(time.strftime('%c') + "\n")
+
+with open("debugFile.txt", "a") as debugFile:
+    debugFile.writelines(prefix + str(None) + "\n")
+
+timeIndex = time.time()
+ultimateIndex = time.time()
+
+t_is_cell_at = [0, 0]
+t_make_cell_at = [0, 0]
+t_assure_cell_at = [0, 0]
+t_remove_cell_at = [0, 0]
+t_determine_variables = [0, 0]
+t_deal_w_game_time = [0, 0]
+t_deal_w_making_deleting_cells = [0, 0]
+t_care_for_cells = [0, 0]
+t_generation = [0, 0]
+t_boring_beginning_of_loop_stuff = [0, 0]
+t_boring_end_of_loop_stuff = [0, 0]
+t_draw_grid = [0, 0]
+t_draw_cells = [0, 0]
+t_draw_views = [0, 0]
+t_check_events = [0, 0]
+
+
+def is_cell_at(x_coord, y_coord):
+    """return whether or not a cell with given coordinates exists."""
+    global t_is_cell_at, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering is_cell_at!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    for i in range(len(living_cells)):
+        if living_cells[i].get_coordinates() == (x_coord, y_coord):
+            prefix = prefix[:-2]
+            with open("debugFile.txt", "a") as debugFile:
+                debugFile.writelines(prefix + "is_cell_at(%s, %s) took %s seconds\n"
+                                     % (x_coord, y_coord, time.time() -
+                                        timeIndex))
+            t_is_cell_at[0] += time.time() - timeIndex
+            t_is_cell_at[1] += 1
+            return i
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "is_cell_at(%s, %s) took %s seconds\n"
+                             % (x_coord, y_coord, time.time() - timeIndex))
+    t_is_cell_at[0] += time.time() - timeIndex
+    t_is_cell_at[1] += 1
+    return None
+
+
+def make_cell_at(color, x_coord, y_coord):
+    global t_make_cell_at, prefix
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Entering make_cell_at!") + "\n")
+    prefix += "  "
+    timeIndex = time.time()
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("added cell at %s, %s" %
+                                          (x_coord, y_coord)) + "\n")
+    dirty_rects.append(Rect((x_coord, y_coord), (choice, choice)))
+    living_cells.append(cell.LivingCell(x_coord, y_coord, color))
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "make_cell_at() took %s seconds\n"
+                             % (time.time() - timeIndex))
+    t_make_cell_at[0] += time.time() - timeIndex
+    t_make_cell_at[1] += 1
+    return
+
+
+def assure_cell_at(color, x_coord, y_coord):
+>>>>>>> origin/master
     """Make certain a cell exists in the list with the coordinates."""
     if is_cell_at(coordinate_key):
         return
     make_cell_at(color, coordinate_key)
 
 
+<<<<<<< HEAD
 def remove_cell_at(coordinate_key):
+=======
+def remove_cell_at(x_coord, y_coord):
+>>>>>>> origin/master
     """remove the cell at given coordinates"""
     index_key = is_cell_at(coordinate_key)
     if index_key:
@@ -114,6 +195,7 @@ def generation():
     check_needs["generate"] = False
     check_needs["population"] = True
     generation_dict = {}
+<<<<<<< HEAD
     for cell_key in living_cells.keys():
         if cell_key == ", ":
             continue
@@ -140,14 +222,53 @@ def generation():
             # count the number of colors at the coordinates
             count = generation_dict[cell_key].count(max(generation_dict[cell_key], key=generation_dict[cell_key].count))
             # if the count is greater than one, the color is the most amount of colors
+=======
+    for living_cell in living_cells:
+        if living_cell.give_to_neighbors():
+            color = living_cell.give_to_neighbors()[0]
+            for coordinate_pair in living_cell.give_to_neighbors()[1]:
+                if coordinate_pair in generation_dict.keys():
+                    generation_dict[coordinate_pair].append(color)
+                else:
+                    generation_dict[coordinate_pair] = [color]
+            if not living_cell.get_coordinates() in generation_dict.keys():
+                generation_dict[living_cell.get_coordinates()] = []
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + str("Halfway generated at %s seconds!" %
+                                          (time.time() - timeIndex)) + "\n")
+    for coordinate_pair in generation_dict.keys():
+        len_gen_dict = len(generation_dict[coordinate_pair])
+        if len_gen_dict < 2 or len_gen_dict > 3:
+            count_remove += 1
+            remove_cell_at(coordinate_pair[0], coordinate_pair[1])
+        elif len_gen_dict == 3:
+            count_make += 1
+            count = generation_dict[coordinate_pair].count(
+                max(generation_dict[coordinate_pair], key=generation_dict[
+                    coordinate_pair].count))
+>>>>>>> origin/master
             if count > 1:
                 color = max(generation_dict[cell_key], key=generation_dict[cell_key].count)
             # otherwise select randomly
             else:
+<<<<<<< HEAD
                 color = random.choice(generation_dict[cell_key])
             # make a cell there
             assure_cell_at(color, cell_key)
         # if it's exactly two, it doesn't change
+=======
+                color = random.choice(generation_dict[coordinate_pair])
+            with open("debugFile.txt", "a") as debugFile:
+                debugFile.writelines(prefix + str("Made it to here!") + "\n")
+            assure_cell_at(color, coordinate_pair[0], coordinate_pair[1])
+    prefix = prefix[:-2]
+    with open("debugFile.txt", "a") as debugFile:
+        debugFile.writelines(prefix + "generation() took %s seconds; remove: %s, make: %s\n"
+                             % (time.time() - timeIndex, count_remove,
+                                count_make))
+    t_generation[0] += time.time() - timeIndex
+    t_generation[1] += 1
+>>>>>>> origin/master
 
 
 def boring_beginning_of_loop_stuff():
