@@ -18,12 +18,14 @@ class LivingCell(object):
     def get_color(self):
         return self.color
 
-    def draw(self, window_object, width, xScale=1, yScale=1):
-        pygame.draw.rect(window_object, self.color, ((self.xCoord * width + self.xCoord + 1) * xScale, (self.yCoord * width + self.yCoord + 1) * yScale, width * xScale, width * yScale))
+    def draw(self, window_object, width, grid_extremities, xScale=1, yScale=1):
+        pygame.draw.rect(window_object, self.color, (((self.xCoord + grid_extremities[0][0]) * width + (self.xCoord + grid_extremities[0][0]) + 1) * xScale, ((self.yCoord + grid_extremities[0][1]) * width + (self.yCoord + grid_extremities[0][1]) + 1) * yScale, width * xScale, width * yScale))
+
     def change_color(self, color):
         self.color = color
 
     def get_coordinates(self):
+        print "HEEEY!!!~~!~!~!~!"
         return((self.xCoord, self.yCoord))
 
     def set_coordinates(self, coordinate_pair):

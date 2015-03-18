@@ -9,10 +9,8 @@ class Timer(object):
         self.color = color
         self.portion = 0.
 
-    def draw(self, windowObject, position, width):
-        pygame.draw.arc(windowObject, self.color, 
-                        pygame.Rect((position), (width, width)), 0,
-                        self.portion)
+    def draw(self, windowObject, rect):
+        pygame.draw.arc(windowObject, self.color, rect, 0, self.portion)
 
     def update_portion(self, updateAmount):
         self.portion += updateAmount

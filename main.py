@@ -5,7 +5,7 @@ while True:
     life.boring_beginning_of_loop_stuff()
     life.determine_variables()
     life.draw_grid()
-    life.draw_cells()
+    life.draw_other_things()
     life.deal_w_game_time()
     life.care_for_cells()
     life.draw_views()
