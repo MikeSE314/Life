@@ -19,6 +19,7 @@ population = 0
 points = 300
 coef = 1. / 4.
 mouse_pos, mouse_coords = (0, 0), (0, 0)
+mouse_use_coords = (mouse_coords[0] - grid_extremities[0][0], mouse_coords[1] - grid_extremities[0][1])
 mouse_color = colors[random.choice(colors.keys())]
 grid_points_start = [(x + 5, y + 8) for x in range(12) for y in range(12)]
 dirty_rects = []
