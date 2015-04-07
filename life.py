@@ -42,6 +42,9 @@ def remove_cell_at(coordinate_key, remove_color=None):
 
 def determine_variables():
     global choice, grid_width, grid_height, mouse_coords, mouse_pos, mouse_is_down, population, check_needs, living_cells, pop_msg, pop_msg_rect, color_msg, color_msg_rect, points_msg, points_msg_rect, grid_dimensions, mouse_color, mouse_is_down, points, grid_extremities
+    choice = max(grid_dimensions[0], grid_dimensions[1])
+    mouse_coords = int(mouse_pos[0] / (choice + 1)), int(mouse_pos[1] / (choice + 1))
+    mouse_use_coords = (mouse_coords[0] - grid_extremities[0][0], mouse_coords[1] - grid_extremities[0][1])
     if check_needs["button_toggles"]:
         check_needs["button_toggles"] = False
         for button in buttons:
@@ -60,7 +63,7 @@ def determine_variables():
         points_msg_rect.topleft = (10, 225)
     if check_needs["mouse_color"]:
         check_needs["mouse_color"] = False
-        mouse_color = living_cells[is_cell_at(mouse_coords) if is_cell_at(mouse_coords) else ", "].get_color()
+        mouse_color = living_cells[is_cell_at(mouse_use_coords) if is_cell_at(mouse_use_coords) else ", "].get_color()
         check_needs["mouse_color_title"] = True
     if check_needs["mouse_color_title"]:
         check_needs["mouse_color_title"] = False
@@ -91,8 +94,6 @@ def determine_variables():
         check_needs["grid_dimensions"] = False
         grid_dimensions = (grid_view_dimensions[0] - grid_main[0] - 1) / float(grid_main[0]), (grid_view_dimensions[1] - grid_main[1] - 1) / float(grid_main[1])
         check_needs["perimiter"] = True
-    choice = max(grid_dimensions[0], grid_dimensions[1])
-    mouse_coords = int(mouse_pos[0] / (choice + 1)), int(mouse_pos[1] / (choice + 1))
     if check_needs["perimiter"]:
         check_needs["perimiter"] = False
         player1_area.determine_drawn_perimiter(choice)
@@ -279,14 +280,14 @@ def check_events():
             mouse_is_down = True
             mouse_pos = event.pos
             check_needs["button_toggles"] = True
-            removing_cells = bool(is_cell_at(mouse_coords))
+            removing_cells = bool(is_cell_at(mouse_use_coords))
         elif event.type == MOUSEBUTTONUP:
             mouse_is_down = False
             mouse_pos = event.pos
             check_needs["button_toggles"] = True
         elif event.type == KEYDOWN:
             if event.key == (K_a):
-                player1_area.append_cell(mouse_coords[0], mouse_coords[1], choice)
+                player1_area.append_cell(mouse_use_coords[0], mouse_use_coords[1], choice)
             if event.key == (K_y):
                 check_needs["mouse_color"] = True
             if event.key == (K_h):
