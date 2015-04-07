@@ -20,7 +20,7 @@ points = 300
 coef = 1. / 4.
 mouse_pos, mouse_coords = (0, 0), (0, 0)
 mouse_use_coords = (mouse_coords[0] - grid_extremities[0][0], mouse_coords[1] - grid_extremities[0][1])
-mouse_color = used_colors[random.choice(used_colors.keys())]
+mouse_color = colors[random.choice(colors.keys())]
 grid_points_start = [(x + 5, y + 8) for x in range(12) for y in range(12)]
 dirty_rects = []
 grid_main = [60, 40]
@@ -57,15 +57,15 @@ window_dimensions = (main_window.get_size())
 grid_view = pygame.Surface((window_dimensions[0] * (1 - coef), window_dimensions[1]))
 grid_view_dimensions = (grid_view.get_size())
 grid_view_rect = grid_view.get_rect()
-grid_view_colors = (colors["dark grey"], used_colors["medium grey"])
+grid_view_colors = (colors["black"], colors["charcoal"])
 mini_view = pygame.Surface((window_dimensions[0] * coef, window_dimensions[1] * coef))
 mini_view_dimensions = (mini_view.get_size())
 mini_view_rect = pygame.Rect((window_dimensions[0] - mini_view_dimensions[0], 0), mini_view_dimensions)
-mini_view_colors = (colors["grey"], used_colors["dark grey"])
+mini_view_colors = (colors["grey"], colors["black"])
 values_view = pygame.Surface((window_dimensions[0] * coef, window_dimensions[1] * (1 - coef)))
 values_view_dimensions = (values_view.get_size())
 values_view_rect = values_view.get_rect(size=values_view_dimensions, topleft=(window_dimensions[0] - values_view_dimensions[0], window_dimensions[1] - values_view_dimensions[1]))
-values_view_colors = (colors["light grey"], used_colors["burnt orange"])
+values_view_colors = (colors["aqua"], colors["amber"])
 # for the music
 music_directory = "music/The Caledonian Club/"
 songs = [(music_directory + song) for song in os.listdir(music_directory) if song[-3:] in ("mp3", "ogg")]
@@ -73,17 +73,17 @@ song_order = random.sample(songs, len(songs))
 music_index_var += 1
 # for the font and messages
 font_obj = pygame.font.Font("freesansbold.ttf", 32)
-pop_msg = font_obj.render("population: " + str(population), True, used_colors["light blue"])
+pop_msg = font_obj.render("population: " + str(population), True, colors["light blue"])
 pop_msg_rect = pop_msg.get_rect()
 pop_msg_rect.topleft = (10, 25)
-color_msg = font_obj.render("color: " + str(reverse_colors[mouse_color]), True, used_colors["light blue"])
+color_msg = font_obj.render("color: " + str(reverse_colors[mouse_color]), True, colors["light blue"])
 color_msg_rect = color_msg.get_rect()
 color_msg_rect.topleft = (10, 75)
-points_msg = font_obj.render("points: " + str(points), True, used_colors["charcoal"])
+points_msg = font_obj.render("points: " + str(points), True, colors["charcoal"])
 points_msg_rect = points_msg.get_rect()
 points_msg_rect.topleft = (10, 225)
 # then the buttons
-buttons = [button.Button((colors["green"], used_colors["grey"], used_colors["pink"]), (10, 125), (140, 40), "append"), button.Button((colors["green"], used_colors["grey"], used_colors["pink"]), (10, 175), (140, 40), "cells")]
+buttons = [button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 125), (140, 40), "append"), button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 175), (140, 40), "cells")]
 # these will needs be defined a lot throughout the code
 grid_dimensions = (grid_view_dimensions[0] - grid_main[0] - 1) / float(grid_main[0]), (grid_view_dimensions[1] - grid_main[1] - 1) / float(grid_main[1])
 choice = max(grid_dimensions[0], grid_dimensions[1])
