@@ -1,0 +1,155 @@
+amber
+amethyst
+apricot
+aqua
+aquamarine
+aubergine
+avocado
+azure
+baby blue
+banana
+beige
+black
+blood orange
+blood red
+blue
+blueberry
+brick
+bright green
+bright orange
+bright purple
+bright red
+bright yellow
+bronze
+brown
+bubblegum
+burgundy
+carnation
+cerulean
+charcoal
+chartreuse
+cherry red
+chocolate
+cinnamon
+cobalt blue
+coffee
+copper
+coral
+cornflower blue
+cream
+crimson
+cyan
+dandelion
+dark brown
+dark green
+dark orange
+dark purple
+dark red
+dark yellow
+denim blue
+dull blue
+dull green
+dull orange
+dull purple
+eggplant
+emerald
+forest green
+fuchsia
+gold
+golden rod
+grape
+grass
+green
+grey
+hazel
+hot pink
+ice blue
+indigo
+ivory
+jade
+kelly green
+khaki
+lavender
+lemon
+light blue
+light brown
+light green
+light orange
+light pink
+light purple
+light red
+light yellow
+lime
+magenta
+mahogany
+maize
+mango
+maroon
+mauve
+midnight blue
+mint
+navy
+neon blue
+neon green
+neon pink
+neon yellow
+olive green
+orange
+orchid
+pale blue
+pale green
+pale orange
+pale pink
+pale purple
+pale red
+pale yellow
+pastel blue
+pastel green
+pastel pink
+pastel purple
+pastel yellow
+peach
+periwinkle
+pine green
+pink
+plum
+puce
+pumpkin
+purple
+raspberry
+red
+red violet
+red wine
+robin's egg
+rose
+royal blue
+royal purple
+ruby
+russet
+sage
+salmon
+sand
+sapphire
+scarlet
+sea green
+sepia
+sienna
+silver
+sky blue
+slate
+squash
+steel blue
+strawberry
+sunflower
+tan
+tangerine
+taupe
+teal
+tomato
+turquoise
+vermillion
+violet
+violet red
+watermelon
+white
+yellow

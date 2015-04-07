@@ -257,6 +257,20 @@ def check_events():
     global mouse_pos, mouse_is_down, removing_cells, mouse_color, music_index_var
     for event in pygame.event.get():
         if event.type == QUIT:
+            with open("debugFile.txt", "a") as debugFile:
+                debugFile.writelines(prefix +
+                                     str("totals:\nt_is_cell_at: %s\nt_assure_cell_at: %s\nt_remove_cell_at: %s\nt_determine_variables: %s\nt_deal_w_game_time: %s\nt_deal_w_making_deleting_cells: %s\nt_care_for_cells: %s\nt_generation: %s\nt_boring_beginning_of_loop_stuff: %s\nt_boring_end_of_loop_stuff: %s\nt_draw_grid: %s,\nt_draw_cells: %s\nt_draw_views: %s\nt_check_events: %s\n" %
+                                         (t_is_cell_at, t_assure_cell_at,
+                                          t_remove_cell_at,
+                                          t_determine_variables,
+                                          t_deal_w_game_time,
+                                          t_deal_w_making_deleting_cells,
+                                          t_care_for_cells, t_generation,
+                                          t_boring_beginning_of_loop_stuff,
+                                          t_boring_end_of_loop_stuff,
+                                          t_draw_grid, t_draw_cells,
+                                          t_draw_views, t_check_events) +
+                                          "\n"))
             pygame.quit()
             sys.exit()
         elif event.type == MOUSEMOTION:
