@@ -10,6 +10,12 @@ import cell
 import perimiter
 
 
+def set_color(color):
+    mouse_color = colors[color]
+    player1_area.change_color(mouse_color)
+    living_cells[", "].change_color(mouse_color)
+
+
 def is_cell_at(coordinate_key):
     """return whether or not a cell with given coordinates exists."""
     for cell_key in living_cells.keys():
@@ -41,7 +47,7 @@ def remove_cell_at(coordinate_key, remove_color=None):
 
 
 def determine_variables():
-    global choice, grid_width, grid_height, mouse_coords, mouse_pos, mouse_is_down, population, check_needs, living_cells, pop_msg, pop_msg_rect, color_msg, color_msg_rect, points_msg, points_msg_rect, grid_dimensions, mouse_color, mouse_is_down, points, grid_extremities
+    global choice, grid_width, grid_height, mouse_coords, mouse_pos, mouse_is_down, population, check_needs, living_cells, pop_msg, pop_msg_rect, color_msg, color_msg_rect, points_msg, points_msg_rect, grid_dimensions, mouse_color, mouse_is_down, points, grid_extremities, mouse_use_coords, pause, cells_is_True_and_append_is_False
     choice = max(grid_dimensions[0], grid_dimensions[1])
     mouse_coords = int(mouse_pos[0] / (choice + 1)), int(mouse_pos[1] / (choice + 1))
     mouse_use_coords = (mouse_coords[0] - grid_extremities[0][0], mouse_coords[1] - grid_extremities[0][1])
@@ -50,8 +56,29 @@ def determine_variables():
         for button in buttons:
             if button.rect.collidepoint((mouse_pos[0] - values_view_rect.left, mouse_pos[1] - values_view_rect.top)) and mouse_is_down:
                 button.toggle()
+                if button.raw_message == "append":
+                    cells_is_True_and_append_is_False = False
+                elif button.raw_message == "cells":
+                    cells_is_True_and_append_is_False = True
+                elif button.raw_message == "cheat":
+                    points += 500
+                    check_needs["points"] = True
+                elif button.raw_message == "quit":
+                    pygame.event.post(pygame.event.Event(QUIT))
+                elif button.raw_message == "pause":
+                    pause = not pause
             else:
                 button.untoggle()
+        if pause:
+            for button in menu_buttons:
+                if button.rect.collidepoint((mouse_pos[0] - menu_view_rect.left, mouse_pos[1] - menu_view_rect.top)) and mouse_is_down:
+                    button.toggle()
+                    if button.raw_message == "quit":
+                        pygame.event.post(pygame.event.Event(QUIT))
+                    elif button.raw_message == "unpause":
+                        pause = not pause
+                else:
+                    button.untoggle()
     if check_needs["generate"]:
         check_needs["generate"] = False
         generation()
@@ -59,8 +86,8 @@ def determine_variables():
     if check_needs["points"]:
         check_needs["points"] = False
         points_msg = font_obj.render("points: " + str(points), True, colors["charcoal"])
-        points_msg_rect = points_msg.get_rect()
-        points_msg_rect.topleft = (10, 225)
+        # points_msg_rect = points_msg.get_rect()
+        # points_msg_rect.topleft = (10, 375)
     if check_needs["mouse_color"]:
         check_needs["mouse_color"] = False
         mouse_color = living_cells[is_cell_at(mouse_use_coords) if is_cell_at(mouse_use_coords) else ", "].get_color()
@@ -90,6 +117,13 @@ def determine_variables():
         grid_extremities[0][0] -= 1
         grid_extremities[1][0] -= 1
         check_needs["grid_dimensions"] = True
+    if check_needs["append_cell"]:
+        check_needs["append_cell"] = False
+        if points >= 27:
+            player1_area.append_cell(mouse_use_coords[0], mouse_use_coords[1], choice)
+            points -= 27
+            check_needs["perimiter"] = True
+            check_needs["points"] = True
     if check_needs["grid_dimensions"]:
         check_needs["grid_dimensions"] = False
         grid_dimensions = (grid_view_dimensions[0] - grid_main[0] - 1) / float(grid_main[0]), (grid_view_dimensions[1] - grid_main[1] - 1) / float(grid_main[1])
@@ -105,30 +139,43 @@ def determine_variables():
         pop_msg_rect.topleft = (10, 25)
 
 
+def menu():
+    global colors
+    pygame.draw.rect(grid_view, colors["pink"], (30, 30, 30, 30))
+
+
 def deal_w_game_time():
     "update the timer, and tell if the game is ready to generate"
-    global check_needs, game_timer
-    check_needs["generate"] = game_timer.update_portion(math.pi / 10)
-    # dirty_rects.append(Rect((values_view.get_width() - 60, values_view.get_height() - 60), (50, 50)))
-    timer_rect = Rect(values_view_dimensions[0] - 60, values_view_dimensions[1] - 60, 50, 50)
-    game_timer.draw(values_view, Rect(values_view.get_width() - 60, values_view.get_height() - 60, 50, 50))
+    global check_needs, game_timer, pause
+    if not pause:
+        check_needs["generate"] = game_timer.update_portion(math.pi / 10)
+        # dirty_rects.append(Rect((values_view.get_width() - 60, values_view.get_height() - 60), (50, 50)))
+        # timer_rect = Rect(values_view_dimensions[0] - 60, values_view_dimensions[1] - 60, 50, 50)
+        game_timer.draw(values_view, Rect(values_view.get_width() - 60, values_view.get_height() - 60, 50, 50))
 
 
 def deal_w_making_deleting_cells():
     "deal with the users' making or deleting of cells"
-    global check_needs, points
-    if mouse_is_down:
-        if grid_view_rect.collidepoint(mouse_pos) and (mouse_coords[0] - grid_extremities[0][0], mouse_coords[1] - grid_extremities[0][1]) in player1_area.get_coords() and mouse_color == player1_area.get_color():
-            check_needs["population"] = True
-            if removing_cells:
-                if remove_cell_at((mouse_coords[0] - grid_extremities[0][0], mouse_coords[1] - grid_extremities[0][1]), mouse_color):
-                    points += 13
-                    check_needs["points"] = True
+    global check_needs, points, pause, cells_is_True_and_append_is_False
+    if not pause:
+        if mouse_is_down:
+            if cells_is_True_and_append_is_False:
+                if grid_view_rect.collidepoint(mouse_pos) and mouse_use_coords in player1_area.get_coords() and mouse_color == player1_area.get_color():
+                    check_needs["population"] = True
+                    if removing_cells:
+                        if remove_cell_at(mouse_use_coords, mouse_color):
+                            points += 13
+                            check_needs["points"] = True
+                    else:
+                        if grid_view_rect.collidepoint(mouse_pos):
+                            if points >= 17:
+                                if assure_cell_at(mouse_color, mouse_use_coords):
+                                    points -= 17
+                                    check_needs["points"] = True
             else:
-                if points >= 17:
-                    if assure_cell_at(mouse_color, (mouse_coords[0] - grid_extremities[0][0], mouse_coords[1] - grid_extremities[0][1])):
-                        points -= 17
-                        check_needs["points"] = True
+                if grid_view_rect.collidepoint(mouse_pos) and mouse_use_coords not in player1_area.get_coords() and mouse_color == player1_area.get_color():
+                    check_needs["append_cell"] = True
+
 
 
 def care_for_cells():
@@ -173,50 +220,52 @@ def care_for_cells():
 
 
 def generation():
-    global check_needs, points
-    generation_dict = {}
-    for cell_key in living_cells.keys():
-        if cell_key == ", ":
-            continue
-        # color of current cell
-        color = living_cells[cell_key].get_color()
-        for coordinate_pair in living_cells[cell_key].give_to_neighbors():
-            # use the color as a counter; more colors means more adjacent cells
-            if coordinate_pair in generation_dict.keys():
-                generation_dict[coordinate_pair].append(color)
-            else:
-                generation_dict[coordinate_pair] = [color]
-        if not cell_key in generation_dict.keys():
-            # make sure there is a place for the last cells
-            generation_dict[cell_key] = []
-    # then loop back through them
-    for cell_key in generation_dict.keys():
-        # find how many are adjacet
-        len_gen_dict_at_key = len(generation_dict[cell_key])
-        # 0 -- 1 or 4 -- 9, kill it
-        if len_gen_dict_at_key < 2 or len_gen_dict_at_key > 3:
-            if remove_cell_at(cell_key):
-                points -= 2
-        # if it's exactly three, it must live
-        elif len_gen_dict_at_key == 3:
-            # count the number of colors at the coordinates
-            count = generation_dict[cell_key].count(max(generation_dict[cell_key], key=generation_dict[cell_key].count))
-            # if the count is greater than one, the color is the most amount of colors
-            if count > 1:
-                color = max(generation_dict[cell_key], key=generation_dict[cell_key].count)
-            # otherwise select randomly
-            else:
-                color = random.choice(generation_dict[cell_key])
-            # make a cell there
-            if assure_cell_at(color, cell_key):
-                points += 3
-                check_needs["points"] = True
-        # if it's exactly two, it doesn't change
+    global check_needs, points, pause
+    if not pause:
+        generation_dict = {}
+        for cell_key in living_cells.keys():
+            if cell_key == ", ":
+                continue
+            # color of current cell
+            color = living_cells[cell_key].get_color()
+            for coordinate_pair in living_cells[cell_key].give_to_neighbors():
+                # use the color as a counter; more colors means more adjacent cells
+                if coordinate_pair in generation_dict.keys():
+                    generation_dict[coordinate_pair].append(color)
+                else:
+                    generation_dict[coordinate_pair] = [color]
+            if not cell_key in generation_dict.keys():
+                # make sure there is a place for the last cells
+                generation_dict[cell_key] = []
+        # then loop back through them
+        for cell_key in generation_dict.keys():
+            # find how many are adjacet
+            len_gen_dict_at_key = len(generation_dict[cell_key])
+            # 0 -- 1 or 4 -- 9, kill it
+            if len_gen_dict_at_key < 2 or len_gen_dict_at_key > 3:
+                if remove_cell_at(cell_key):
+                    points -= 2
+            # if it's exactly three, it must live
+            elif len_gen_dict_at_key == 3:
+                # count the number of colors at the coordinates
+                count = generation_dict[cell_key].count(max(generation_dict[cell_key], key=generation_dict[cell_key].count))
+                # if the count is greater than one, the color is the most amount of colors
+                if count > 1:
+                    color = max(generation_dict[cell_key], key=generation_dict[cell_key].count)
+                # otherwise select randomly
+                else:
+                    color = random.choice(generation_dict[cell_key])
+                # make a cell there
+                if assure_cell_at(color, cell_key):
+                    points += 3
+                    check_needs["points"] = True
+            # if it's exactly two, it doesn't change
 
 
 def boring_beginning_of_loop_stuff():
     global check_needs, dirty_rects, sound_obj, ultimateIndex
     dirty_rects = []
+    menu_view.fill(menu_view_colors[0])
     grid_view.fill(grid_view_colors[0])
     mini_view.fill(mini_view_colors[0])
     values_view.fill(values_view_colors[0])
@@ -236,19 +285,24 @@ def draw_grid():
 
 
 def draw_other_things():
-    global population, font_obj, pop_msg, pop_msg_rect, color_msg, color_msg_rect, buttons, points_msg, points_msg_rect, grid_extremities
+    global population, font_obj, pop_msg, pop_msg_rect, color_msg, color_msg_rect, buttons, menu_buttons, points_msg, points_msg_rect, grid_extremities
     for cell_key in living_cells.keys():
         living_cells[cell_key].draw(grid_view, choice, grid_extremities)
         living_cells[cell_key].draw(mini_view, choice, grid_extremities, coef, coef)
     player1_area.draw(grid_view, grid_extremities, choice)
     for button in buttons:
         button.draw(values_view)
+    for button in menu_buttons:
+        button.draw(menu_view)
     values_view.blit(pop_msg, pop_msg_rect)
     values_view.blit(color_msg, color_msg_rect)
     values_view.blit(points_msg, points_msg_rect)
 
 
 def draw_views():
+    global pause
+    if pause:
+        grid_view.blit(menu_view, menu_view_rect)
     main_window.blit(grid_view, (0, 0))
     main_window.blit(mini_view, mini_view_rect)
     main_window.blit(values_view, values_view_rect)
@@ -258,20 +312,6 @@ def check_events():
     global mouse_pos, mouse_is_down, removing_cells, mouse_color, music_index_var
     for event in pygame.event.get():
         if event.type == QUIT:
-            with open("debugFile.txt", "a") as debugFile:
-                debugFile.writelines(prefix +
-                                     str("totals:\nt_is_cell_at: %s\nt_assure_cell_at: %s\nt_remove_cell_at: %s\nt_determine_variables: %s\nt_deal_w_game_time: %s\nt_deal_w_making_deleting_cells: %s\nt_care_for_cells: %s\nt_generation: %s\nt_boring_beginning_of_loop_stuff: %s\nt_boring_end_of_loop_stuff: %s\nt_draw_grid: %s,\nt_draw_cells: %s\nt_draw_views: %s\nt_check_events: %s\n" %
-                                         (t_is_cell_at, t_assure_cell_at,
-                                          t_remove_cell_at,
-                                          t_determine_variables,
-                                          t_deal_w_game_time,
-                                          t_deal_w_making_deleting_cells,
-                                          t_care_for_cells, t_generation,
-                                          t_boring_beginning_of_loop_stuff,
-                                          t_boring_end_of_loop_stuff,
-                                          t_draw_grid, t_draw_cells,
-                                          t_draw_views, t_check_events) +
-                                          "\n"))
             pygame.quit()
             sys.exit()
         elif event.type == MOUSEMOTION:
@@ -286,13 +326,13 @@ def check_events():
             mouse_pos = event.pos
             check_needs["button_toggles"] = True
         elif event.type == KEYDOWN:
-            if event.key == (K_a):
-                player1_area.append_cell(mouse_use_coords[0], mouse_use_coords[1], choice)
-            if event.key == (K_y):
-                check_needs["mouse_color"] = True
-            if event.key == (K_h):
-                check_needs["mouse_color_title"] = True
-                mouse_color = colors[random.choice(colors.keys())]
+            # if event.key == (K_a):
+            #     check_needs["append_cell"] = True
+            # if event.key == (K_y):
+            #     check_needs["mouse_color"] = True
+            # if event.key == (K_h):
+            #     check_needs["mouse_color_title"] = True
+            #     mouse_color = colors[random.choice(colors.keys())]
             if event.key == K_LEFT:
                 change_view_by["pan_left"] = True
             if event.key == K_RIGHT:

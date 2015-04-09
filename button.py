@@ -10,6 +10,7 @@ class Button(object):
         self.position = position
         self.dimensions = dimensions
         self.rect = pygame.Rect(self.position, self.dimensions)
+        self.raw_message = message
         self.message = font_obj.render(str(message), False, self.colors[0])
         self.msg_rect = self.message.get_rect()
         self.msg_rect.topleft = (self.position[0] + 10, self.position[1] + 3)

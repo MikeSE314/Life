@@ -7,7 +7,7 @@ class Perimiter(object):
     def __init__(self, color):
         super(Perimiter, self).__init__()
         self.cell_list = set() # to change rarely
-        self.color = color # to remain constant
+        self.color = color # to remain constant, maybe. probably will change once.
         self.drawn_perimiter = {} # to change frequently
 
     def append_cell_no_check(self, x, y):
@@ -68,8 +68,10 @@ class Perimiter(object):
         for pair_of_coordinate_pairs in self.drawn_perimiter.values():
             pygame.draw.line(surface, self.color, (((pair_of_coordinate_pairs[0][0] + grid_extremities[0][0]) * scale + (pair_of_coordinate_pairs[0][0] + grid_extremities[0][0])), ((pair_of_coordinate_pairs[0][1] + grid_extremities[0][1]) * scale + (pair_of_coordinate_pairs[0][1] + grid_extremities[0][1]))), (((pair_of_coordinate_pairs[1][0] + grid_extremities[0][0]) * scale + (pair_of_coordinate_pairs[1][0] + grid_extremities[0][0])), ((pair_of_coordinate_pairs[1][1] + grid_extremities[0][1]) * scale + (pair_of_coordinate_pairs[1][1] + grid_extremities[0][1]))), 3)
 
-
     def change_coordinates(self, change, scale):
         for cell in self.cell_list:
             cell = (cell[0] + change[0], cell[1] + change[1])
         self.determine_drawn_perimiter(scale)
+
+    def change_color(self, color_literal):
+        self.color = color_literal

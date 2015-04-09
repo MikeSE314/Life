@@ -40,8 +40,10 @@ cream
 crimson
 cyan
 dandelion
+dark blue
 dark brown
 dark green
+dark grey
 dark orange
 dark purple
 dark red
@@ -60,6 +62,7 @@ golden rod
 grape
 grass
 green
+green yellow
 grey
 hazel
 hot pink
@@ -88,6 +91,7 @@ maroon
 mauve
 midnight blue
 mint
+mud
 navy
 neon blue
 neon green
@@ -118,6 +122,7 @@ pumpkin
 purple
 raspberry
 red
+red orange
 red violet
 red wine
 robin's egg

@@ -9,6 +9,8 @@ import button
 
 
 # some important variables
+cells_is_True_and_append_is_False = True
+pause = False
 music_enabled = False
 grid_extremities = [[0, 0], [40, 40]]
 mouse_is_down = False
@@ -36,7 +38,8 @@ check_needs = {
     "mouse_color": True,
     "mouse_color_title": True,
     "button_toggles": False,
-    "points": True
+    "points": True,
+    "append_cell": False
 }
 change_view_by = {
     "zoom_out": False,
@@ -65,7 +68,12 @@ mini_view_colors = (colors["grey"], colors["black"])
 values_view = pygame.Surface((window_dimensions[0] * coef, window_dimensions[1] * (1 - coef)))
 values_view_dimensions = (values_view.get_size())
 values_view_rect = values_view.get_rect(size=values_view_dimensions, topleft=(window_dimensions[0] - values_view_dimensions[0], window_dimensions[1] - values_view_dimensions[1]))
-values_view_colors = (colors["aqua"], colors["amber"])
+values_view_colors = (colors["steel blue"], colors["amber"])
+menu_view = pygame.Surface((grid_view_dimensions[0] / 2, grid_view_dimensions[1] / 2))
+menu_view.set_alpha(230)
+menu_view_dimensions = (menu_view.get_size())
+menu_view_rect = menu_view.get_rect(size=menu_view_dimensions, topleft=(grid_view_dimensions[0] / 4, grid_view_dimensions[1] / 4))
+menu_view_colors = (colors["steel blue"], colors["peach"])
 # for the music
 music_directory = "music/The Caledonian Club/"
 songs = [(music_directory + song) for song in os.listdir(music_directory) if song[-3:] in ("mp3", "ogg")]
@@ -81,9 +89,10 @@ color_msg_rect = color_msg.get_rect()
 color_msg_rect.topleft = (10, 75)
 points_msg = font_obj.render("points: " + str(points), True, colors["charcoal"])
 points_msg_rect = points_msg.get_rect()
-points_msg_rect.topleft = (10, 225)
+points_msg_rect.topleft = (10, 375)
 # then the buttons
-buttons = [button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 125), (140, 40), "append"), button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 175), (140, 40), "cells")]
+menu_buttons = [button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 25), (80, 40), "quit"), button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 75), (160, 40), "unpause")]
+buttons = [button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 125), (140, 40), "append"), button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 175), (140, 40), "cells"), button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 225), (140, 40), "pause"), button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 275), (140, 40), "quit"), button.Button((colors["green"], colors["grey"], colors["pink"]), (10, 325), (140, 40), "cheat")]
 # these will needs be defined a lot throughout the code
 grid_dimensions = (grid_view_dimensions[0] - grid_main[0] - 1) / float(grid_main[0]), (grid_view_dimensions[1] - grid_main[1] - 1) / float(grid_main[1])
 choice = max(grid_dimensions[0], grid_dimensions[1])

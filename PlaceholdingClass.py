@@ -29,3 +29,6 @@ class PlaceholdingClass(object):
 
     def change_coordinates(self, change):
         self.coords = (self.coords[0] + change[0], self.coords[1] + change[1])
+
+    def change_color(self, color_literal):
+        self.color = color_literal
