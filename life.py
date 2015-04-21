@@ -6,8 +6,20 @@ import os
 import random
 import math
 import types
+import socket
 import cell
 import perimiter
+
+
+def setup_socket(name, HOST_IP):
+    global client_socket, data
+    print socket.gethostbyname(socket.gethostname())
+    try:
+        client_socket.connect((HOST_IP, 8001))
+    except Exception as error:
+        print("Could not connect to the server: %s" % error)
+    data = client_socket.recv(4096)
+    client_socket.send("NAME|%s", name)
 
 
 def set_color(color):
@@ -47,14 +59,26 @@ def remove_cell_at(coordinate_key, remove_color=None):
 
 
 def determine_variables():
-    global choice, grid_width, grid_height, mouse_coords, mouse_pos, mouse_is_down, population, check_needs, living_cells, pop_msg, pop_msg_rect, color_msg, color_msg_rect, points_msg, points_msg_rect, grid_dimensions, mouse_color, mouse_is_down, points, grid_extremities, mouse_use_coords, pause, cells_is_True_and_append_is_False
+    global choice, grid_width, grid_height, mouse_coords, mouse_pos, keys_down, population, check_needs, living_cells, pop_msg, pop_msg_rect, color_msg, color_msg_rect, points_msg, points_msg_rect, grid_dimensions, mouse_color, points, grid_extremities, mouse_use_coords, pause, cells_is_True_and_append_is_False
     choice = max(grid_dimensions[0], grid_dimensions[1])
     mouse_coords = int(mouse_pos[0] / (choice + 1)), int(mouse_pos[1] / (choice + 1))
     mouse_use_coords = (mouse_coords[0] - grid_extremities[0][0], mouse_coords[1] - grid_extremities[0][1])
+    if "up" in keys_down:
+        change_view_by["pan_up"] = True
+    if "down" in keys_down:
+        change_view_by["pan_down"] = True
+    if "left" in keys_down:
+        change_view_by["pan_left"] = True
+    if "right" in keys_down:
+        change_view_by["pan_right"] = True
+    if "m4" in keys_down:
+        change_view_by["zoom_out"] = True
+    if "m5" in keys_down:
+        change_view_by["zoom_in"] = True
     if check_needs["button_toggles"]:
         check_needs["button_toggles"] = False
         for button in buttons:
-            if button.rect.collidepoint((mouse_pos[0] - values_view_rect.left, mouse_pos[1] - values_view_rect.top)) and mouse_is_down:
+            if button.rect.collidepoint((mouse_pos[0] - values_view_rect.left, mouse_pos[1] - values_view_rect.top)) and "m1" in keys_down:
                 button.toggle()
                 if button.raw_message == "append":
                     cells_is_True_and_append_is_False = False
@@ -71,7 +95,7 @@ def determine_variables():
                 button.untoggle()
         if pause:
             for button in menu_buttons:
-                if button.rect.collidepoint((mouse_pos[0] - menu_view_rect.left, mouse_pos[1] - menu_view_rect.top)) and mouse_is_down:
+                if button.rect.collidepoint((mouse_pos[0] - menu_view_rect.left, mouse_pos[1] - menu_view_rect.top)) and "m1" in keys_down:
                     button.toggle()
                     if button.raw_message == "quit":
                         pygame.event.post(pygame.event.Event(QUIT))
@@ -117,10 +141,22 @@ def determine_variables():
         grid_extremities[0][0] -= 1
         grid_extremities[1][0] -= 1
         check_needs["grid_dimensions"] = True
+    if change_view_by["zoom_in"]:
+        change_view_by["zoom_in"] = False
+        print "hello"
+        grid_extremities[0][0] -= 1
+        grid_extremities[0][1] -= 1
+        grid_extremities[1][0] -= 1
+        grid_extremities[1][1] -= 1
+    if change_view_by["zoom_out"]:
+        change_view_by["zoom_out"] = False
+        print "heyo"
+        grid_extremities[1][0] += 1
+        grid_extremities[1][1] += 1
     if check_needs["append_cell"]:
         check_needs["append_cell"] = False
         if points >= 27:
-            player1_area.append_cell(mouse_use_coords[0], mouse_use_coords[1], choice)
+            player1_area.append_cell(mouse_use_coords[0], mouse_use_coords[1])
             points -= 27
             check_needs["perimiter"] = True
             check_needs["points"] = True
@@ -130,7 +166,7 @@ def determine_variables():
         check_needs["perimiter"] = True
     if check_needs["perimiter"]:
         check_needs["perimiter"] = False
-        player1_area.determine_drawn_perimiter(choice)
+        player1_area.determine_drawn_perimiter()
     if check_needs["population"]:
         check_needs["population"] = False
         population = len(living_cells) - 1
@@ -158,7 +194,7 @@ def deal_w_making_deleting_cells():
     "deal with the users' making or deleting of cells"
     global check_needs, points, pause, cells_is_True_and_append_is_False
     if not pause:
-        if mouse_is_down:
+        if "m1" in keys_down:
             if cells_is_True_and_append_is_False:
                 if grid_view_rect.collidepoint(mouse_pos) and mouse_use_coords in player1_area.get_coords() and mouse_color == player1_area.get_color():
                     check_needs["population"] = True
@@ -309,7 +345,8 @@ def draw_views():
 
 
 def check_events():
-    global mouse_pos, mouse_is_down, removing_cells, mouse_color, music_index_var
+    global mouse_pos, removing_cells, mouse_color, music_index_var, keys_down
+    data = client_socket.recv(RECV_BUFFER)
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -317,32 +354,26 @@ def check_events():
         elif event.type == MOUSEMOTION:
             mouse_pos = event.pos
         elif event.type == MOUSEBUTTONDOWN:
-            mouse_is_down = True
+            keys_down.add("m" + str(event.button))
+            if event.button == 4:
+                change_view_by["zoom_out"] = True
+            if event.button == 5:
+                change_view_by["zoom_in"] = True
+                print "yolo"
             mouse_pos = event.pos
             check_needs["button_toggles"] = True
             removing_cells = bool(is_cell_at(mouse_use_coords))
         elif event.type == MOUSEBUTTONUP:
-            mouse_is_down = False
+            keys_down.remove("m" + str(event.button))
             mouse_pos = event.pos
             check_needs["button_toggles"] = True
         elif event.type == KEYDOWN:
-            # if event.key == (K_a):
-            #     check_needs["append_cell"] = True
-            # if event.key == (K_y):
-            #     check_needs["mouse_color"] = True
-            # if event.key == (K_h):
-            #     check_needs["mouse_color_title"] = True
-            #     mouse_color = colors[random.choice(colors.keys())]
-            if event.key == K_LEFT:
-                change_view_by["pan_left"] = True
-            if event.key == K_RIGHT:
-                change_view_by["pan_right"] = True
-            if event.key == K_UP:
-                change_view_by["pan_up"] = True
-            if event.key == K_DOWN:
-                change_view_by["pan_down"] = True
+            keys_down.add(pygame.key.name(event.key))
             if event.key == K_ESCAPE:
                 pygame.event.post(pygame.event.Event(QUIT))
+        elif event.type == KEYUP:
+            if pygame.key.name(event.key) in keys_down:
+                keys_down.remove(pygame.key.name(event.key))
         elif event.type == MUSIC_HAS_ENDED:
             pygame.mixer.music.queue(song_order[music_index_var % len(song_order)])
             music_index_var += 1

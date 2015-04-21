@@ -28,7 +28,7 @@ print("Chat server started on port %s" % PORT)
 key = "0123456789abcdef"
 iv = " ".join(str(random.randint(0, 255)) for i in range(16))
 
-while True:
+while True: # kelly.lent@gmail.com
     read_sockets, write_sockets, error_sockets = select.select(connection_list,[],[])
     for s in read_sockets:
         if s == server_socket:

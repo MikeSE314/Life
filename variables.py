@@ -6,13 +6,16 @@ import PlaceholdingClass
 import timer
 import perimiter
 import button
+import socket
 
 
 # some important variables
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+data = None
 cells_is_True_and_append_is_False = True
 pause = False
 music_enabled = False
-grid_extremities = [[0, 0], [40, 40]]
+grid_extremities = [[0, 0], [20, 20]]
 mouse_is_down = False
 removing_cells = False
 music_index_var = 0
@@ -29,6 +32,8 @@ grid_main = [60, 40]
 living_cells = {}
 living_cells[", "] = PlaceholdingClass.PlaceholdingClass(mouse_color)
 # some convenient dictionaries
+keys_down = set()
+yesterday_down = keys_down
 check_needs = {
     "population": True,
     "entire_grid": True,

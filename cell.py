@@ -25,7 +25,6 @@ class LivingCell(object):
         self.color = color
 
     def get_coordinates(self):
-        print "HEEEY!!!~~!~!~!~!"
         return((self.xCoord, self.yCoord))
 
     def set_coordinates(self, coordinate_pair):

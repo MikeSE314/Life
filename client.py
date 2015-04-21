@@ -6,7 +6,7 @@ import sys
 import time
 
 
-HOST = 'localhost'  # 127.0.0.1
+HOST = '10.75.49.34'  # 127.0.0.1
 PORT = 8001
 RECV_BUFFER = 4096
 mode = AES.MODE_CBC
