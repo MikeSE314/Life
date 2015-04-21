@@ -345,8 +345,8 @@ def draw_views():
 
 
 def check_events():
-    global mouse_pos, removing_cells, mouse_color, music_index_var, keys_down
-    data = client_socket.recv(RECV_BUFFER)
+    global mouse_pos, mouse_is_down, removing_cells, mouse_color, music_index_var
+    data = client_socket.recv(RECV_BUFFR) # yore
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()

@@ -4,7 +4,7 @@ import select
 import socket
 import sys
 
-HOST = 'localhost'
+HOST = '10.75.49.34'
 PORT = 8001  # 127.0.0.1
 RECV_BUFFER = 4096  # Size of packet
 
@@ -51,6 +51,7 @@ while True: # kelly.lent@gmail.com
                 connection_list.remove(s)
             else:
                 if data.startswith("NAME"):
+                    print(data)
                     name = data.split("|")[1]
                     connection_dict[name] = s
                 elif data.startswith("MESSAGE|"):
