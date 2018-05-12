@@ -12,15 +12,19 @@ import perimiter
 
 
 def setup_socket(name, HOST_IP):
-    global client_socket, data
+    pass
+    """global client_socket, data
     print socket.gethostbyname(socket.gethostname())
     try:
+        print("try")
         client_socket.connect((HOST_IP, 8001))
+        print("in try")
     except Exception as error:
         print("Could not connect to the server: %s" % error)
+    print("after try")
     data = client_socket.recv(4096)
     client_socket.send("NAME|%s", name)
-
+    """
 
 def set_color(color):
     mouse_color = colors[color]
@@ -346,7 +350,7 @@ def draw_views():
 
 def check_events():
     global mouse_pos, mouse_is_down, removing_cells, mouse_color, music_index_var
-    data = client_socket.recv(RECV_BUFFR) # yore
+    # data = client_socket.recv(RECV_BUFFR) # yore
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()

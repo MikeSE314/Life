@@ -60,7 +60,8 @@ pygame.display.set_caption("Lyfe")
 fps_clock = pygame.time.Clock()
 # differing views for the main function of the game
 window_dimensions = (0, 0)
-main_window = pygame.display.set_mode(window_dimensions, pygame.FULLSCREEN)
+main_window = pygame.display.set_mode(window_dimensions, pygame.RESIZABLE)
+# main_window = pygame.display.set_mode(window_dimensions, pygame.FULLSCREEN)
 window_dimensions = (main_window.get_size())
 grid_view = pygame.Surface((window_dimensions[0] * (1 - coef), window_dimensions[1]))
 grid_view_dimensions = (grid_view.get_size())
@@ -80,7 +81,7 @@ menu_view_dimensions = (menu_view.get_size())
 menu_view_rect = menu_view.get_rect(size=menu_view_dimensions, topleft=(grid_view_dimensions[0] / 4, grid_view_dimensions[1] / 4))
 menu_view_colors = (colors["steel blue"], colors["peach"])
 # for the music
-music_directory = "music/The Caledonian Club/"
+music_directory = "resources/music/The Caledonian Club/"
 songs = [(music_directory + song) for song in os.listdir(music_directory) if song[-3:] in ("mp3", "ogg")]
 song_order = random.sample(songs, len(songs))
 music_index_var += 1

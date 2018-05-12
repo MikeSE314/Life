@@ -11,17 +11,22 @@ def game((r_color, name), HOST_IP):
     life.set_color(r_color)
     if HOST_IP == None:
         my_ip = socket.gethostbyname(socket.gethostname())
-        variables.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        variables.server_socket = socket.socket(socket.AF_INET, \
+                socket.SOCK_STREAM)
         try:
             variables.server_socket.bind((my_ip, 8001))
         except socket.error as error:
+            print("except . . .")
             # Server is already running on port 8001, or PORT
-            print('Bind failed. Error Code : %s\nMessage : %s' % (error[0], error[1]))
+            print('Bind failed. Error Code : %s\nMessage : %s' % (error[0], \
+                    error[1]))
             sys.exit()
         life.setup_socket(name, my_ip)
     else:
+        print("else . . .")
         life.setup_socket(name, HOST_IP)
     while True:
+        print("while . . .")
         life.boring_beginning_of_loop_stuff()
         life.determine_variables()
         life.draw_grid()

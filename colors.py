@@ -1,4 +1,4 @@
-import pygame
+# import pygame
 
 colors = {
     "acid green": (143, 254, 9, 255),
